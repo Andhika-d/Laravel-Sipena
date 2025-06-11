@@ -57,7 +57,7 @@
                 <input type="text" id="searchGuru" class="form-control form-control-sm mb-3" placeholder="Cari Guru...">
               </div>
               <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
-                <i class="bi bi-plus-lg"></i> Guru</button>
+              <i class="bi bi-plus-lg"></i> Guru</button>
 
               <!-- Modal Tambah Guru -->
               <div class="modal fade" id="modalTambahGuru" tabindex="-1">
@@ -127,7 +127,7 @@
                   <td>{{ $guru->mengajar }}</td>
                   <td>{{ $guru->kelas }}</td>
                   <td>
-                    <!-- Tombol Edit, modal nanti -->
+                    <!-- Tombol Edit -->
                     <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditGuru{{ $guru->id }}">
                     <i class="bi bi-pencil-square"></i>
                     </button>

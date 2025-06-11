@@ -56,7 +56,62 @@
               <div class="col-md-4">
                 <input type="text" id="searchInput" class="form-control form-control-sm mb-3" placeholder="Cari pengguna...">
               </div>
-              <button type="button" class="btn btn-primary mb-3"><i class="bi bi-plus-lg"></i> Akun</button>
+              <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahAkun">
+              <i class="bi bi-plus-lg"></i> Akun</button>
+
+              <!-- Modal Tambah Akun -->
+              <div class="modal fade" id="modalTambahAkun" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <form autocomplete="off" action="{{ route('admin.guru-akun.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                      <h5 class="modal-title">Tambah Akun Guru</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                      {{-- Pilih Guru --}}
+                      <div class="form-floating mb-3">
+                        <select name="guru_id" class="form-select">
+                        <option value="" disabled selected>-- Pilih Guru --</option>
+                        @foreach ($gurus as $guru)
+                          <option value="{{ $guru->id }}">{{ $guru->nama }}</option>
+                        @endforeach
+                        </select>
+                        <label for="floatingGuru">Nama Guru</label>
+                      </div>
+
+                      {{-- Email --}}
+                      <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="floatingEmail" name="email" placeholder="Email" required>
+                        <label for="floatingEmail">Email</label>
+                      </div>
+
+                      {{-- Password --}}
+                      <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
+                        <label for="floatingPassword">Password</label>
+                      </div>
+
+                      {{-- Role --}}
+                      <div class="form-floating mb-3">
+                        <select class="form-select" id="floatingRole" name="role" required>
+                          <option value="guru">Guru</option>
+                          <option value="kepsek">Kepala Sekolah</option>
+                        </select>
+                        <label for="floatingRole">Role</label>
+                      </div>
+                    </div>
+
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                      <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              </div>
+
               <!-- Default Table -->
               <table class="table">
                 <thead>
@@ -68,7 +123,24 @@
                     <th scope="col">Aksi</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                @foreach ($users as $index => $user)
+                  <tr>
+                    <th scope="row">{{ $index + 1 }}</th>
+                    <td>{{ $user->name }}</td>
+                    <td>{{ $user->email }}</td>
+                    <td>{{ $user->created_at->format('d M Y') }}</td>
+                    <td>
+                      <a href="#" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil-square"></i>
+                      </a>
+                      <a href="#" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
               </table>
               <!-- End Default Table Example -->
             </div>

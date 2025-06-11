@@ -28,6 +28,8 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         // middleware lain, misal:
         'auth' => \App\Http\Middleware\Authenticate::class,
+        'role.redirect' => \App\Http\Middleware\RoleRedirect::class,
+
     ];
 
     /**
