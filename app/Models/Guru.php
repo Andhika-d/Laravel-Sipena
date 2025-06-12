@@ -16,4 +16,9 @@ class Guru extends Model
         'mengajar',
         'kelas',
     ];
+    public function user()
+    {
+    return $this->hasOne(User::class, 'guru_id');
+    }
+
 }

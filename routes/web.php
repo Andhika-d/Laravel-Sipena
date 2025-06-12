@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\GuruAkunController;
+use App\Http\Controllers\UserGuruController;
 
 
 Route::get('/', function () {
@@ -41,4 +42,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
   //Buat Akun Guru
   Route::get('/guru-akun/create', [GuruAkunController::class, 'create'])->name('admin.guru-akun.create');
   Route::post('/guru-akun', [GuruAkunController::class, 'store'])->name('admin.guru-akun.store');
+});
+
+Route::prefix('guru')->middleware('auth')->group(function () {
+    Route::get('/', [UserGuruController::class, 'dashboard'])->name('guru.dashboard');
 });
