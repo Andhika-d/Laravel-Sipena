@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\GuruAkunController;
 use App\Http\Controllers\UserGuruController;
+use App\Http\Controllers\AbsensiGuruController;
 
 
 Route::get('/', function () {
@@ -46,4 +47,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
 Route::prefix('guru')->middleware('auth')->group(function () {
     Route::get('/', [UserGuruController::class, 'dashboard'])->name('guru.dashboard');
+    Route::get('/absensi', [AbsensiGuruController::class, 'index'])->name('guru.absensi');
+    Route::post('/absensi/masuk', [AbsensiGuruController::class, 'absenMasuk'])->name('guru.absen.masuk');
+    Route::post('/absensi/pulang', [AbsensiGuruController::class, 'absenPulang'])->name('guru.absen.pulang');
 });

@@ -1,6 +1,6 @@
 @extends('guru.layout')
 
-@section('title', 'Home')
+@section('title', 'Absens')
 
 @section('content')
 <div class="content-wrapper">

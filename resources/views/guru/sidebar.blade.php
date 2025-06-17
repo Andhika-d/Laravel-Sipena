@@ -52,8 +52,8 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('guru.dashboard') }}" class="brand-link">
-      <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">SIPENA</span>
+    <img src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+    <span class="brand-text font-weight-light">SIPENA</span>
     </a>
 
     <!-- Sidebar -->
@@ -76,33 +76,17 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item">
-            <a href="{{ route('guru.dashboard') }}" class="nav-link">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
+            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+              <i class="nav-icon fas fa-home"></i>
               <p>Home</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
-              <p>
-                Utama
-                <i class="right fas fa-angle-left"></i>
-              </p>
+            <a href="{{ route('guru.absensi') }}" 
+            class="nav-link {{ request()->routeIs('guru.absensi') ? 'active' : '' }}">
+              <i class="fas fa-address-card nav-icon"></i>
+              <p>Absensi</p>
             </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="diagnosa.php" class="nav-link">
-                  <i class="fas fa-stethoscope nav-icon"></i>
-                  <p>Mulai Diagnosa</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="hasildiagnosa.php" class="nav-link">
-                  <i class="fas fa-chart-pie nav-icon"></i>
-                  <p>Hasil Diagnosa</p>
-                </a>
-              </li>
-            </ul>
           </li>
         </ul>
       </nav>
