@@ -44,6 +44,7 @@
 
   <!-- JS -->
   <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
   <script>
         document.addEventListener('DOMContentLoaded', function () {

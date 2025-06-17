@@ -12,16 +12,26 @@ class AbsensiGuruController extends Controller
     // Halaman form absensi
     public function index()
     {
-        $user = Auth::user();
-        $today = Carbon::today();
-        $now = Carbon::now();
+    $user = Auth::user();
+    $guru = $user->guru;
+    $today = Carbon::today();
+    $now = Carbon::now();
+    $jamMasukMulai = Carbon::createFromTime(6, 0);
+    $jamMasukSelesai = Carbon::createFromTime(8, 0);
+    $jamPulang = Carbon::createFromTime(14, 0);
 
-        // Cek apakah sudah absen hari ini
-        $absenHariIni = AbsensiGuru::where('user_id', $user->id)
-            ->whereDate('tanggal', $today)
-            ->first();
+    $absenHariIni = AbsensiGuru::where('user_id', $user->id)
+        ->whereDate('tanggal', $today)
+        ->first();
 
-        return view('guru.absensi.index', compact('absenHariIni', 'now'));
+    return view('guru.absensi.index', compact(
+    'guru',
+    'absenHariIni',
+    'now',
+    'jamMasukMulai',
+    'jamMasukSelesai',
+    'jamPulang'
+    ));
     }
 
     // Absen masuk (hadir atau telat)

@@ -20,6 +20,11 @@ class AbsensiGuru extends Model
         'status_verifikasi',
     ];
 
+    protected $casts = [
+    'jam_masuk' => 'datetime',
+    'jam_pulang' => 'datetime',
+];
+
     // Relasi ke tabel users
     public function user()
     {
