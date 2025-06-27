@@ -120,7 +120,9 @@
                 {{-- Absen Masuk --}}
                 <form method="POST" action="{{ route('guru.absen.masuk') }}">
                   @csrf
-                  <button type="submit" class="info-box btn btn-link p-0 text-left" style="border:none; background:none;">
+                  <input type="hidden" name="latitude" id="latitude">
+                  <input type="hidden" name="longitude" id="longitude">
+                  <button type="submit" class="info-box btn btn-link p-0 text-left " style="border:none; background:none;">
                     <span class="info-box-icon bg-primary elevation-1">
                       <i class="fas fa-user-tie"></i>
                     </span>
@@ -129,13 +131,18 @@
                       <small class="text-success">
                         <i class="fa fa-check-circle"></i> Klik untuk Absen Masuk
                       </small>
+                      <small class="text-danger location-warning d-none">
+                          <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
+                      </small>
                     </div>
                   </button>
                 </form>
-              @elseif ($now->gt($jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
+                @elseif ($now->gt($jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
                 {{-- Telat --}}
                 <form method="POST" action="{{ route('guru.absen.masuk') }}">
                   @csrf
+                  <input type="hidden" name="latitude" id="latitude">
+                  <input type="hidden" name="longitude" id="longitude">
                   <button type="submit" class="info-box btn btn-link p-0 text-left" style="border:none; background:none;">
                     <span class="info-box-icon bg-warning elevation-1">
                       <i class="fas fa-user-tie"></i>
@@ -144,6 +151,9 @@
                       <span class="info-box-number">Absen Telat</span>
                       <small class="text-warning">
                         <i class="fa fa-exclamation-circle"></i> Klik untuk Absen Telat
+                      </small>
+                      <small class="text-danger location-warning d-none">
+                          <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
                       </small>
                     </div>
                   </button>
@@ -167,59 +177,60 @@
             </div>
             {{-- ABSEN PULANG --}}
             <div class="col-md-6">
-  @php
-    $sudahAbsenMasuk = $absenHariIni && $absenHariIni->jam_masuk;
-    $sudahAbsenPulang = $absenHariIni && $absenHariIni->jam_pulang;
-  @endphp
+              @php
+                $sudahAbsenMasuk = $absenHariIni && $absenHariIni->jam_masuk;
+                $sudahAbsenPulang = $absenHariIni && $absenHariIni->jam_pulang;
+              @endphp
 
-  @if (!$sudahAbsenMasuk)
-    {{-- Belum Absen Masuk --}}
-    <div class="info-box">
-      <span class="info-box-icon bg-secondary elevation-1">
-        <i class="fas fa-user-tie"></i>
-      </span>
-      <div class="info-box-content">
-        <span class="info-box-number">Absen Pulang (Terkunci)</span>
-        <small class="text-muted"><i class="fa fa-clock"></i> Belum Absen Masuk</small>
-      </div>
-    </div>
+              @if (!$sudahAbsenMasuk)
+                {{-- Belum Absen Masuk --}}
+                <div class="info-box">
+                  <span class="info-box-icon bg-secondary elevation-1">
+                    <i class="fas fa-user-tie"></i>
+                  </span>
+                  <div class="info-box-content">
+                    <span class="info-box-number">Absen Pulang (Terkunci)</span>
+                    <small class="text-muted"><i class="fa fa-clock"></i> Belum Absen Masuk</small>
+                  </div>
+                </div>
 
-  @elseif ($now->lt($jamPulang))
-    {{-- Sudah Absen Masuk tapi Belum Waktu Pulang --}}
-    <div class="info-box">
-      <span class="info-box-icon bg-secondary elevation-1">
-        <i class="fas fa-user-tie"></i>
-      </span>
-      <div class="info-box-content">
-        <span class="info-box-number">Absen Pulang (Terkunci)</span>
-        <small class="text-muted"><i class="fa fa-clock"></i> Belum Waktu Pulang</small>
-      </div>
-    </div>
+              @elseif ($now->lt($jamPulang))
+                {{-- Sudah Absen Masuk tapi Belum Waktu Pulang --}}
+                <div class="info-box">
+                  <span class="info-box-icon bg-secondary elevation-1">
+                    <i class="fas fa-user-tie"></i>
+                  </span>
+                  <div class="info-box-content">
+                    <span class="info-box-number">Absen Pulang (Terkunci)</span>
+                    <small class="text-muted"><i class="fa fa-clock"></i> Belum Waktu Pulang</small>
+                  </div>
+                </div>
 
-  @else
-    {{-- Sudah Waktu Pulang --}}
-    <form method="POST" action="{{ route('guru.absen.pulang') }}">
-      @csrf
-      <button type="submit"
-        class="info-box btn btn-link p-0 text-left"
-        style="border: none; background: none;"
-        {{ $sudahAbsenPulang ? 'disabled' : '' }}>
+              @else
+                {{-- Sudah Waktu Pulang --}}
+                <form method="POST" action="{{ route('guru.absen.pulang') }}">
+                  @csrf
+                  <input type="hidden" name="latitude" id="latitude">
+                  <input type="hidden" name="longitude" id="longitude">
+                  <button type="submit"
+                    class="info-box btn btn-link p-0 text-left"
+                    style="border: none; background: none;"
+                    {{ $sudahAbsenPulang ? 'disabled' : '' }}>
 
-        <span class="info-box-icon bg-danger elevation-1">
-          <i class="fas fa-user-tie"></i>
-        </span>
-        <div class="info-box-content">
-          <span class="info-box-number">Absen Pulang</span>
-          <small class="{{ $sudahAbsenPulang ? 'text-success' : 'text-danger' }}">
-            <i class="fa fa-check-circle"></i>
-            {{ $sudahAbsenPulang ? 'Sudah Absen Pulang' : 'Belum Absen' }}
-          </small>
-        </div>
-      </button>
-    </form>
-  @endif
-</div>
-
+                    <span class="info-box-icon bg-danger elevation-1">
+                      <i class="fas fa-user-tie"></i>
+                    </span>
+                    <div class="info-box-content">
+                      <span class="info-box-number">Absen Pulang</span>
+                      <small class="{{ $sudahAbsenPulang ? 'text-success' : 'text-danger' }}">
+                        <i class="fa fa-check-circle"></i>
+                        {{ $sudahAbsenPulang ? 'Sudah Absen Pulang' : 'Belum Absen' }}
+                      </small>
+                    </div>
+                  </button>
+                </form>
+              @endif
+            </div>
             </div>
             <!-- Absen QR -->
             <!-- <div class="row my-3">
@@ -299,6 +310,7 @@
           <p class="text-muted mb-0">
             <i class="fas fa-info-circle"></i> Hanya bisa absen masuk <strong>sekali per hari</strong>.
           </p>
+          
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -307,4 +319,92 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (navigator.geolocation) {
+      // Script Temu Lokasi
+      // navigator.geolocation.getCurrentPosition(
+      // function(position) {
+      //   const latitude = position.coords.latitude;
+      //   const longitude = position.coords.longitude;
+      //   console.log("Lokasi lo sekarang:", latitude, longitude); // Tambahin ini
+      // },
+      // function(error) {
+      //   console.error("Gagal dapet lokasi:", error); // Buat liat errornya
+      // }
+      // );
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          
+
+          // Set ke input hidden
+          document.getElementById("latitude").value = userLat;
+          document.getElementById("longitude").value = userLng;
+
+          // Lokasi sekolah/kantor (ganti dengan koordinat aslinya nanti)
+          const kantorLat = -6.0757615; // latitude
+          const kantorLng = 106.0934919; // longitude
+
+          const distance = getDistanceFromLatLonInMeters(userLat, userLng, kantorLat, kantorLng);
+
+          // Optional: validasi jarak maksimal (contoh: 100 meter)
+          const maxDistance = 800;
+
+          console.log("Lokasi user:", userLat, userLng);
+          console.log("Lokasi kantor:", kantorLat, kantorLng);
+          console.log("Jarak ke kantor:", distance, "meter");
+
+          if (distance > maxDistance) {
+          window.isLocationValid = false;
+
+          document.querySelectorAll('form button[type="submit"]').forEach(btn => {
+            // Sembunyikan tombolnya biar ga bikin layout aneh
+            btn.closest('form').classList.add('d-none');
+          });
+
+          // Tampilkan card khusus “di luar area”
+          const lokasiInvalidBox = document.createElement('div');
+          lokasiInvalidBox.className = 'info-box';
+          lokasiInvalidBox.innerHTML = `
+            <span class="info-box-icon bg-danger">
+              <i class="fas fa-map-marker-alt"></i>
+            </span>
+            <div class="info-box-content">
+              <span class="info-box-number text-danger">Lokasi Tidak Valid</span>
+              <small class="text-muted">
+                Kamu berada di luar area Sekolah (${maxDistance}m)
+              </small>
+            </div>
+          `;
+
+          const targetCol = document.querySelector('.col-md-6'); // ganti selector biar tepat
+          targetCol.appendChild(lokasiInvalidBox);
+        }
+        },
+        function (error) {
+          alert("Gagal mengambil lokasi. Pastikan kamu mengizinkan akses lokasi di browser.");
+        });
+    } else {
+      alert("Browser tidak mendukung Geolocation.");
+    }
+
+    function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Radius bumi dalam meter
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      const d = R * c;
+      return d;
+    }
+  });
+</script>
 @endsection

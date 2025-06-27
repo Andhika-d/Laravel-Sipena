@@ -19,8 +19,9 @@
   </a>
 
   <ul id="components-nav" 
-      class="nav-content collapse {{ request()->routeIs('admin.datamaster.*') ? 'show' : '' }}" 
-      data-bs-parent="#sidebar-nav">
+    class="nav-content collapse {{ request()->routeIs('admin.datamaster.*') || request()->routeIs('admin.kelas.*') || request()->routeIs('admin.siswa.*') || request()->routeIs('admin.mapel.*') ? 'show' : '' }}" 
+    data-bs-parent="#sidebar-nav">
+
     <li>
       <a href="{{ route('admin.datamaster.users') }}" 
          class="{{ request()->routeIs('admin.datamaster.users') ? 'active' : '' }}">
@@ -31,6 +32,24 @@
       <a href="{{ route('admin.datamaster.dataguru') }}" 
          class="{{ request()->routeIs('admin.datamaster.dataguru') ? 'active' : '' }}">
         <i class="bi bi-circle"></i><span>Data Guru</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ route('admin.kelas.index') }}" 
+        class="{{ request()->routeIs('admin.kelas.*') ? 'active' : '' }}">
+        <i class="bi bi-circle"></i><span>Data Kelas</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ route('admin.siswa.index') }}" 
+        class="{{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+        <i class="bi bi-circle"></i><span>Data Siswa</span>
+      </a>
+    </li>
+    <li>
+      <a href="{{ route('admin.mapel.index') }}" 
+        class="{{ request()->routeIs('admin.mapel.*') ? 'active' : '' }}">
+        <i class="bi bi-circle"></i><span>Data Mata Pelajaran</span>
       </a>
     </li>
   </ul>

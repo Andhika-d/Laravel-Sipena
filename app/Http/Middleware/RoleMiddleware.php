@@ -10,10 +10,14 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role)
     {
-        if (Auth::check() && Auth::user()->role === $role) {
-            return $next($request);
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Anda harus login terlebih dahulu.');
         }
 
-        abort(403); // Forbidden
+        if (Auth::user()->role !== $role) {
+            return redirect()->route('login')->with('error', "Anda harus login sebagai {$role} untuk mengakses halaman ini.");
+        }
+
+        return $next($request);
     }
 }

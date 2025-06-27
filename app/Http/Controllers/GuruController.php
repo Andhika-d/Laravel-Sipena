@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 
 class GuruController extends Controller
 {
     public function index() {
         $gurus = Guru::all();
-        return view('admin.DataMaster.DataGuru', compact('gurus'));
+        $kelases = Kelas::all();
+        return view('admin.DataMaster.DataGuru', compact('gurus','kelases'));
     }
 
     public function create() {
@@ -22,7 +24,7 @@ class GuruController extends Controller
             'jk' => 'required|in:L,P',
             'jurusan' => 'required|string|max:255',
             'mengajar' => 'required|string|max:255',
-            'kelas' => 'required|string|max:255',
+            'kelas_id' => 'required|exists:kelas,id',
         ]);
 
         Guru::create([
@@ -30,7 +32,7 @@ class GuruController extends Controller
             'jenis_kelamin' => $request->jk,
             'jurusan_prodi' => $request->jurusan,
             'mengajar' => $request->mengajar,
-            'kelas' => $request->kelas,
+            'kelas_id' => $request->kelas_id,
         ]);
 
         return redirect()->back()->with('success', 'Data guru berhasil ditambahkan.');
@@ -47,12 +49,18 @@ class GuruController extends Controller
             'jenis_kelamin' => 'required|in:L,P',
             'jurusan_prodi' => 'required|string|max:255',
             'mengajar' => 'required|string|max:255',
-            'kelas' => 'required|string|max:255',
+            'kelas_id' => 'required|exists:kelas,id',
         ]);
     
         $guru = Guru::findOrFail($id);
-        $guru->update($request->all());
-    
+        $guru->update([
+            'nama' => $request->nama,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'jurusan_prodi' => $request->jurusan_prodi,
+            'mengajar' => $request->mengajar,
+            'kelas_id' => $request->kelas_id,
+        ]);
+
         return redirect()->back()->with('success', 'Data guru berhasil diupdate.');
     }
     

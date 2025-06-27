@@ -14,11 +14,22 @@ class Guru extends Model
         'jenis_kelamin',
         'jurusan_prodi',
         'mengajar',
-        'kelas',
+        'kelas_id',
     ];
     public function user()
     {
     return $this->hasOne(User::class, 'guru_id');
     }
+
+    public function nilaiHarian()
+    {
+        return $this->hasMany(NilaiHarian::class, 'guru_id');
+    }
+
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
+    }
+
 
 }

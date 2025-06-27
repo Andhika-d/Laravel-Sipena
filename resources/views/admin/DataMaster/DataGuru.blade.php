@@ -91,8 +91,13 @@
                       <label for="floatingMengajar">Mengajar</label>
                     </div>
                     <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingKelas" name="kelas" placeholder="Kelas">
-                      <label for="floatingKelas">Kelas</label>
+                    <select class="form-select" id="floatingKelas" name="kelas_id" required>
+                      <option selected disabled>Pilih Kelas</option>
+                      @foreach ($kelases as $kelas)
+                        <option value="{{ $kelas->id }}">{{ $kelas->nama }}</option>
+                      @endforeach
+                    </select>
+                    <label for="floatingKelas">Kelas</label>
                     </div>
                     </div>
                     <div class="modal-footer">
@@ -125,7 +130,7 @@
                   <td>{{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                   <td>{{ $guru->jurusan_prodi }}</td>
                   <td>{{ $guru->mengajar }}</td>
-                  <td>{{ $guru->kelas }}</td>
+                  <td>{{ $guru->kelas->nama ?? '-' }}</td>
                   <td>
                     <!-- Tombol Edit -->
                     <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditGuru{{ $guru->id }}">
@@ -174,10 +179,14 @@
                             <input type="text" class="form-control" name="mengajar" value="{{ $guru->mengajar }}" placeholder="Mengajar">
                             <label>Mengajar</label>
                           </div>
-                          <div class="form-floating mb-3">
-                            <input type="text" class="form-control" name="kelas" value="{{ $guru->kelas }}" placeholder="Kelas">
-                            <label>Kelas</label>
-                          </div>
+                          <select class="form-select" name="kelas_id" required>
+                            <option disabled>Pilih Kelas</option>
+                            @foreach ($kelases as $kelas)
+                              <option value="{{ $kelas->id }}" {{ $guru->kelas_id == $kelas->id ? 'selected' : '' }}>
+                                {{ $kelas->nama }}
+                              </option>
+                            @endforeach
+                          </select>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

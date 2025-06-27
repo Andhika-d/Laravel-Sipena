@@ -23,6 +23,11 @@ class AbsensiGuruController extends Controller
     $absenHariIni = AbsensiGuru::where('user_id', $user->id)
         ->whereDate('tanggal', $today)
         ->first();
+    
+    $lokasiKantor = [
+    'lat' => -6.0757615, 
+    'lng' => 106.0934919 
+    ];
 
     return view('guru.absensi.index', compact(
     'guru',
@@ -30,7 +35,8 @@ class AbsensiGuruController extends Controller
     'now',
     'jamMasukMulai',
     'jamMasukSelesai',
-    'jamPulang'
+    'jamPulang',
+    'lokasiKantor'
     ));
     }
 

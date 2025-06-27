@@ -5,7 +5,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="index.php" class="nav-link">Home</a>
+        <a href="{{ route('guru.dashboard') }}" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link"></a>
@@ -86,6 +86,20 @@
             class="nav-link {{ request()->routeIs('guru.absensi') ? 'active' : '' }}">
               <i class="fas fa-address-card nav-icon"></i>
               <p>Absensi</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('guru.penilaian') }}" 
+            class="nav-link {{ request()->routeIs('guru.penilaian') ? 'active' : '' }}">
+              <i class="fas fa-newspaper nav-icon"></i>
+              <p>Penilaian</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-toggle="modal" data-target="#logoutModal" 
+            class="nav-link">
+              <i class="fas fa-door-open nav-icon"></i>
+              <p>Logout</p>
             </a>
           </li>
         </ul>

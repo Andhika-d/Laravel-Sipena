@@ -41,6 +41,36 @@
 
     @yield('content')
   </div>
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="logoutModalLabel">
+            <i class="fas fa-exclamation-triangle mr-2"></i> Konfirmasi Logout
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        
+        <div class="modal-body text-center">
+            <p class="mb-0">Apakah kamu yakin ingin keluar dari akun ini?</p>
+            <small class="text-muted">Aksi ini akan mengakhiri sesi kamu saat ini.</small>
+        </div>
+        
+        <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Batal
+            </button>
+            <a href="{{ route('logout') }}" class="btn btn-danger">
+            <i class="fas fa-sign-out-alt mr-1"></i> Logout
+            </a>
+        </div>
+        </div>
+    </div>
+    </div>
 
   <!-- JS -->
   <script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
