@@ -64,7 +64,7 @@
                       <th>No</th>
                       <th>Nama Siswa</th>
                       <th>Kelas</th>
-                      <th>Tanggal</th>
+                      <th>Tanggal Dinilai</th>
                       <th>Deskripsi Tugas</th>
                       <th>Nilai</th>
                       <th>Aksi</th>
@@ -123,7 +123,7 @@
                                   <!-- Kelas -->
                                   <div class="form-group col-md-6">
                                     <label class="font-weight-bold">Kelas</label>
-                                    <select name="kelas_id" class="form-control" required>
+                                    <select name="kelas_id" class="form-control" disabled>
                                       @foreach($kelases as $kelas)
                                         <option value="{{ $kelas->id }}" {{ $nilai->siswa->kelas_id == $kelas->id ? 'selected' : '' }}>
                                           {{ $kelas->nama }}
@@ -134,14 +134,23 @@
                                 </div>
 
                                 <div class="row">
-                                  <!-- Deskripsi Tugas -->
-                                  <div class="form-group col-md-8">
+                                  <!-- Tanggal -->
+                                  <div class="form-group col-md-6">
+                                    <label class="font-weight-bold">Tanggal</label>
+                                    <input type="date" name="tanggal" class="form-control" 
+                                      value="{{ \Carbon\Carbon::parse($nilai->tanggal)->format('Y-m-d') }}" required>
+                                  </div>
+
+                                  <!-- Deskripsi -->
+                                  <div class="form-group col-md-6">
                                     <label class="font-weight-bold">Deskripsi Tugas</label>
                                     <input type="text" name="deskripsi_tugas" class="form-control" value="{{ $nilai->deskripsi }}" required>
                                   </div>
+                                </div>
 
+                                <div class="row">
                                   <!-- Nilai -->
-                                  <div class="form-group col-md-4">
+                                  <div class="form-group col-md-6">
                                     <label class="font-weight-bold">Nilai</label>
                                     <input type="number" name="nilai" class="form-control" value="{{ $nilai->nilai }}" min="0" max="100" required>
                                   </div>
@@ -160,13 +169,14 @@
                           </div>
                         </div>
                       </div>
-                    @endforeach
+                      @endforeach
                   </tbody>
                 </table>
               </div>
               <!-- /.card-body -->
             </div>
             <!-- /.card -->
+
             <!-- Modal -->
             <div class="modal fade" id="tambahNilaiModal" tabindex="-1" role="dialog" aria-labelledby="tambahNilaiModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
@@ -197,6 +207,16 @@
                           <option value="">-- Pilih Siswa --</option>
                           @foreach ($siswa as $item)
                             <option value="{{ $item->id }}">{{ $item->nama }} ({{ $item->kelas->nama }})</option>
+                          @endforeach
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="mapel_id">Mata Pelajaran</label>
+                        <select name="mapel_id" id="mapel_id" class="form-control" required>
+                          <option value="">-- Pilih Mapel --</option>
+                          @foreach ($mapels as $mapel)
+                            <option value="{{ $mapel->id }}">{{ $mapel->nama_mapel }}</option>
                           @endforeach
                         </select>
                       </div>

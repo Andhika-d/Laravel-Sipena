@@ -15,14 +15,14 @@ class PenilaianController extends Controller
     public function index()
     {
         $siswa = Siswa::with('kelas')->get();
-        $mapel = Mapel::all();
+        $mapels = Mapel::all();
         $kelases = Kelas::all();
         $nilaiHarian = NilaiHarian::with(['siswa.kelas', 'mapel'])
             ->where('guru_id', Auth::user()->guru->id)
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('guru.penilaian.index', compact('siswa', 'mapel', 'nilaiHarian', 'kelases'));
+        return view('guru.penilaian.index', compact('siswa', 'mapels', 'nilaiHarian', 'kelases'));
     }
 
     // SIMPAN NILAI HARIAN
@@ -63,12 +63,14 @@ class PenilaianController extends Controller
         $request->validate([
             'deskripsi_tugas' => 'required|string',
             'nilai' => 'required|numeric|min:0|max:100',
+            'tanggal' => 'required|date',
         ]);
 
         $nilai = NilaiHarian::findOrFail($id);
         $nilai->update([
             'deskripsi' => $request->deskripsi_tugas,
             'nilai' => $request->nilai,
+            'tanggal' => $request->tanggal,
         ]);
 
         return redirect()->route('guru.penilaian')->with('success', 'Data nilai berhasil diperbarui.');

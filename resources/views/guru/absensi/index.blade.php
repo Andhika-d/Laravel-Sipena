@@ -68,7 +68,7 @@
                             <td style="width: 1px" class="px-2">
                               :
                             </td>
-                            <td>{{ $guru->kelas }}</td>
+                            <td>{{ $guru->kelas->nama ?? '-' }}</td>
                           </tr>
                           <tr>
                             <td style="font-weight: bold !important;">QR Code</td>
