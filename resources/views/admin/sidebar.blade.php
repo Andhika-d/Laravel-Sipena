@@ -3,12 +3,12 @@
 
 <ul class="sidebar-nav" id="sidebar-nav">
 
-<li class="nav-item">
-  <a class="nav-link {{ request()->routeIs('admin.dashboard') ? '' : 'collapsed' }}" href="{{ route('admin.dashboard') }}">
-    <i class="bi bi-grid"></i>
-    <span>Dashboard</span>
-  </a>
-</li>
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? '' : 'collapsed' }}" href="{{ route('admin.dashboard') }}">
+      <i class="bi bi-grid"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
 
   <li class="nav-item">
   <a class="nav-link {{ request()->routeIs('admin.datamaster.*') ? '' : 'collapsed' }}" 
@@ -54,7 +54,15 @@
     </li>
   </ul>
   </li>
-  </ul>
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </a>
+  </li>
+
+</ul>
 
 </aside>
 <!-- End Sidebar-->
