@@ -49,13 +49,18 @@
                   <!-- Spacer -->
                   <div style="width: 10px;"></div>
 
-                  <!-- Button tambah -->
-                  <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#tambahNilaiModal">
+                  <!-- Button Tambah -->
+                  <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#tambahNilaiModal">
                     <i class="fas fa-plus"></i> Tambah
                   </button>
+
+                  <!-- Button Rekap -->
+                  <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#rekapModal">
+                    <i class="fas fa-file-csv"></i> Rekap Nilai
+                  </button>
+
                 </div>
               </div>
-              <!-- /.card-header -->
               <div class="card-body table-responsive p-0">
 
                 <table class="table table-hover text-nowrap">
@@ -172,10 +177,9 @@
                       @endforeach
                   </tbody>
                 </table>
+
               </div>
-              <!-- /.card-body -->
             </div>
-            <!-- /.card -->
 
             <!-- Modal -->
             <div class="modal fade" id="tambahNilaiModal" tabindex="-1" role="dialog" aria-labelledby="tambahNilaiModalLabel" aria-hidden="true">
@@ -250,6 +254,56 @@
               </div>
             </div> 
             <!-- Input Modal End -->
+
+            <!-- MODAL: Rekap Nilai -->
+            <div class="modal fade" id="rekapModal" tabindex="-1" role="dialog" aria-labelledby="rekapModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-sm" role="document">
+                <form action="{{ route('guru.penilaian.rekap') }}" method="GET">
+                  <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                      <h5 class="modal-title font-weight-bold" id="rekapModalLabel">
+                        <i class="fas fa-file-csv mr-2"></i>Rekap Nilai Siswa
+                      </h5>
+                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+
+                    <div class="modal-body">
+                      <div class="form-group">
+                        <label for="kelas_id">Pilih Kelas</label>
+                        <select name="kelas_id" id="kelas_id" class="form-control" required>
+                          <option value="">-- Pilih Kelas --</option>
+                          @foreach ($kelases as $kelas)
+                            <option value="{{ $kelas->id }}">{{ $kelas->nama }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="mapel_id">Pilih Mapel</label>
+                        <select name="mapel_id" id="mapel_id" class="form-control" required>
+                          <option value="">-- Pilih Mapel --</option>
+                          @foreach ($mapels as $mapel)
+                            <option value="{{ $mapel->id }}">{{ $mapel->nama_mapel }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                      <button type="submit" class="btn btn-success">
+                        <i class="fas fa-download mr-1"></i> Download CSV
+                      </button>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i> Batal
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
           </div>
         </div>
 

@@ -11,9 +11,12 @@ class AbsensiGuruController extends Controller
 {
     // Halaman form absensi
     public function index()
-    {
+{
     $user = Auth::user();
     $guru = $user->guru;
+    if ($guru) {
+        $guru->load('mapel');
+    }
     $today = Carbon::today();
     $now = Carbon::now();
     $jamMasukMulai = Carbon::createFromTime(6, 0);
@@ -25,20 +28,20 @@ class AbsensiGuruController extends Controller
         ->first();
     
     $lokasiKantor = [
-    'lat' => -6.0757615, 
-    'lng' => 106.0934919 
+        'lat' => -6.0758171,
+        'lng' => 106.0935026 
     ];
 
     return view('guru.absensi.index', compact(
-    'guru',
-    'absenHariIni',
-    'now',
-    'jamMasukMulai',
-    'jamMasukSelesai',
-    'jamPulang',
-    'lokasiKantor'
+        'guru',
+        'absenHariIni',
+        'now',
+        'jamMasukMulai',
+        'jamMasukSelesai',
+        'jamPulang',
+        'lokasiKantor'
     ));
-    }
+}
 
     // Absen masuk (hadir atau telat)
     public function absenMasuk(Request $request)
@@ -62,7 +65,9 @@ class AbsensiGuruController extends Controller
             'tanggal' => $today,
             'jam_masuk' => $now,
             'is_telat' => $isTelat,
+            'status_kehadiran' => 'hadir', // <<< tambahin ini bro
         ]);
+
 
         return back()->with('success', $isTelat ? 'Anda absen telat.' : 'Absen masuk berhasil.');
     }
@@ -92,5 +97,42 @@ class AbsensiGuruController extends Controller
         ]);
 
         return back()->with('success', 'Absen pulang berhasil.');
+    }
+
+    public function ajukanIzin(Request $request)
+    {
+        $request->validate([
+            'status_kehadiran' => 'required|in:izin,sakit',
+            'deskripsi' => 'nullable|string',
+            'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = Auth::user();
+        $today = Carbon::today();
+
+        $sudahAbsen = AbsensiGuru::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->exists();
+
+        if ($sudahAbsen) {
+            return back()->with('error', 'Anda sudah mengisi absensi hari ini.');
+        }
+
+        $filePath = null;
+        if ($request->hasFile('file_pendukung')) {
+            $filePath = $request->file('file_pendukung')->store('izin_sakit', 'public');
+        }
+
+        AbsensiGuru::create([
+            'user_id' => $user->id,
+            'tanggal' => $today,
+            'status_kehadiran' => $request->status_kehadiran,
+            'deskripsi' => $request->deskripsi,
+            'file_pendukung' => $filePath,
+            'is_telat' => false,
+            'status_verifikasi' => false,
+        ]);
+
+        return back()->with('success', 'Pengajuan izin/sakit berhasil dikirim.');
     }
 }

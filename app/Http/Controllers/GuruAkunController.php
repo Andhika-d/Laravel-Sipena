@@ -33,7 +33,7 @@ class GuruAkunController extends Controller
 {
     $request->validate([
         'guru_id' => 'required|exists:gurus,id|unique:users,guru_id',
-        'email'   => 'required|email|unique:users,email',
+        'email' => 'required|email|ends_with:@sipena.com',
         'role'    => 'required|in:guru,kepsek',
         'password' => 'required|min:6',
     ]);

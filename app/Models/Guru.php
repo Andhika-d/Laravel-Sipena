@@ -18,7 +18,7 @@ class Guru extends Model
     ];
     public function user()
     {
-    return $this->hasOne(User::class, 'guru_id');
+    return $this->hasOne(User::class, 'guru_id', 'id');
     }
 
     public function nilaiHarian()
@@ -31,5 +31,9 @@ class Guru extends Model
         return $this->belongsTo(Kelas::class);
     }
 
+    public function mapel()
+    {
+        return $this->belongsToMany(Mapel::class, 'guru_mapel');
+    }
 
 }

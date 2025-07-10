@@ -12,12 +12,15 @@ class AbsensiGuru extends Model
     protected $table = 'absensi_guru';
 
     protected $fillable = [
-        'user_id',
-        'tanggal',
-        'jam_masuk',
-        'jam_pulang',
-        'is_telat',
-        'status_verifikasi',
+    'user_id',
+    'tanggal',
+    'jam_masuk',
+    'jam_pulang',
+    'status_kehadiran',
+    'deskripsi',
+    'file_pendukung',
+    'is_telat',
+    'status_verifikasi',
     ];
 
     protected $casts = [
@@ -30,4 +33,5 @@ class AbsensiGuru extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }

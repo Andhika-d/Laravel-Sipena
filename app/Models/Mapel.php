@@ -15,5 +15,12 @@ class Mapel extends Model
     {
         return $this->hasMany(NilaiHarian::class);
     }
+
+    public function gurus()
+    {
+        return $this->belongsToMany(Guru::class, 'guru_mapel');
+    }
+    
+
 }
 

@@ -5,12 +5,12 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>Data Guru - Admin</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
+  <link href="{{ asset('images/favicon-32x32.png') }}" rel="icon">
   <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -50,7 +50,7 @@
 
     <section class="section">
       <div class="row">
-      <div class="card">
+        <div class="card">
             <div class="card-body">
               <h5 class="card-title">Tabel Data Guru</h5>
               <div class="col-md-4">
@@ -86,9 +86,13 @@
                       <input type="text" class="form-control" id="floatingJurusan" name="jurusan" placeholder="Jurusan">
                       <label for="floatingJurusan">Jurusan</label>
                     </div>
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingMengajar" name="mengajar" placeholder="Mapel">
-                      <label for="floatingMengajar">Mengajar</label>
+                    <div class="mb-3">
+                      <label for="floatingMengajar" class="form-label">Mengajar</label>
+                      <select name="mapel[]" id="floatingMengajar" class="form-select" multiple>
+                        @foreach ($mapels as $m)
+                          <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                        @endforeach
+                      </select>
                     </div>
                     <div class="form-floating mb-3">
                     <select class="form-select" id="floatingKelas" name="kelas_id" required>
@@ -110,7 +114,8 @@
               </div>
 
               <!-- Default Table -->
-              <table class="table">
+               <div class="table-responsive">
+              <table class="table table-bordered">
                 <thead>
                   <tr>
                     <th scope="col">No</th>
@@ -125,27 +130,35 @@
                 <tbody>
                 @foreach ($gurus as $key => $guru)
                 <tr>
-                  <td>{{ $key + 1 }}</td>
-                  <td>{{ $guru->nama }}</td>
-                  <td>{{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
-                  <td>{{ $guru->jurusan_prodi }}</td>
-                  <td>{{ $guru->mengajar }}</td>
-                  <td>{{ $guru->kelas->nama ?? '-' }}</td>
-                  <td>
+                  <td class="align-middle">{{ $key + 1 }}</td>
+                  <td class="align-middle">{{ $guru->nama }}</td>
+                  <td class="align-middle">
+                    {{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                  </td>
+                  <td class="align-middle">{{ $guru->jurusan_prodi }}</td>
+                  <td class="align-middle" style="max-width: 300px; white-space: normal;">
+                    @foreach ($guru->mapel as $m)
+                      <span class="badge bg-primary me-1 mb-1">{{ $m->nama_mapel }}</span>
+                    @endforeach
+                  </td>
+                  <td class="align-middle">{{ $guru->kelas->nama ?? '-' }}</td>
+                  <td class="text-center align-middle">
+                  <div class="d-flex justify-content-center gap-2 flex-wrap">
                     <!-- Tombol Edit -->
                     <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditGuru{{ $guru->id }}">
-                    <i class="bi bi-pencil-square"></i>
+                      <i class="bi bi-pencil-square"></i>
                     </button>
-                    
+
                     <!-- Form Hapus -->
-                    <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus data ini?')">
+                    <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" onsubmit="return confirm('Yakin hapus data ini?')">
                       @csrf
                       @method('DELETE')
                       <button type="submit" class="btn btn-danger btn-sm">
-                      <i class="bi bi-trash"></i>
+                        <i class="bi bi-trash"></i>
                       </button>
                     </form>
-                  </td>
+                  </div>
+                </td>
                 </tr>
 
                 <!-- Modal Edit -->
@@ -160,10 +173,12 @@
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                         </div>
                         <div class="modal-body">
+
                           <div class="form-floating mb-3">
                             <input type="text" class="form-control" name="nama" value="{{ $guru->nama }}" placeholder="Nama">
                             <label>Nama</label>
                           </div>
+
                           <div class="form-floating mb-3">
                             <select class="form-select" name="jenis_kelamin" aria-label="Pilih jenis kelamin">
                               <option value="L" {{ $guru->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
@@ -171,22 +186,35 @@
                             </select>
                             <label>Jenis Kelamin</label>
                           </div>
+
                           <div class="form-floating mb-3">
                             <input type="text" class="form-control" name="jurusan_prodi" value="{{ $guru->jurusan_prodi }}" placeholder="Jurusan">
                             <label>Jurusan</label>
                           </div>
-                          <div class="form-floating mb-3">
-                            <input type="text" class="form-control" name="mengajar" value="{{ $guru->mengajar }}" placeholder="Mengajar">
-                            <label>Mengajar</label>
+
+                          <div class="mb-3">
+                            <label for="editMapelSelect{{ $guru->id }}" class="form-label">Mapel yang Diampu</label>
+                            <select class="form-select" name="mapel_ids[]" multiple id="editMapelSelect{{ $guru->id }}">
+                              @foreach ($mapels as $mapel)
+                                <option value="{{ $mapel->id }}" {{ $guru->mapel->contains($mapel->id) ? 'selected' : '' }}>
+                                  {{ $mapel->nama_mapel }}
+                                </option>
+                              @endforeach
+                            </select>
                           </div>
-                          <select class="form-select" name="kelas_id" required>
-                            <option disabled>Pilih Kelas</option>
-                            @foreach ($kelases as $kelas)
-                              <option value="{{ $kelas->id }}" {{ $guru->kelas_id == $kelas->id ? 'selected' : '' }}>
-                                {{ $kelas->nama }}
-                              </option>
-                            @endforeach
-                          </select>
+
+                          <div class="mb-3">
+                            <label for="editKelasSelect{{ $guru->id }}" class="form-label">Kelas</label>
+                            <select class="form-select" name="kelas_id" id="editKelasSelect{{ $guru->id }}" required>
+                              <option disabled>Pilih Kelas</option>
+                              @foreach ($kelases as $kelas)
+                                <option value="{{ $kelas->id }}" {{ $guru->kelas_id == $kelas->id ? 'selected' : '' }}>
+                                  {{ $kelas->nama }}
+                                </option>
+                              @endforeach
+                            </select>
+                          </div>
+
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -200,6 +228,7 @@
                 @endforeach
                 </tbody>
               </table>
+              </div>
               <!-- End Default Table Example -->
             </div>
           </div>

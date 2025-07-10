@@ -5,12 +5,12 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Dashboard - NiceAdmin Bootstrap Template</title>
+  <title>Data Akun - Admin</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
+  <link href="{{ asset('images/favicon-32x32.png') }}" rel="icon">
   <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -82,9 +82,10 @@
                       </div>
 
                       {{-- Email --}}
-                      <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingEmail" name="email" placeholder="Email" required>
-                        <label for="floatingEmail">Email</label>
+                      <div class="form-floating mb-3 position-relative">
+                        <input type="text" class="form-control pe-5" id="floatingEmail" name="email" placeholder="Email" required>
+                        <label for="floatingEmail">Email (tanpa @sipena.com)</label>
+                        <span class="position-absolute top-50 end-0 translate-middle-y text-muted me-3">@sipena.com</span>
                       </div>
 
                       {{-- Password --}}
@@ -167,6 +168,21 @@
 
   <!-- Template Main JS File -->
   <script src="{{ asset('assets/js/main.js') }}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.querySelector('#modalTambahAkun form');
+      const emailInput = form.querySelector('input[name="email"]');
+
+      form.addEventListener('submit', function () {
+        const val = emailInput.value.trim();
+        if (val && !val.includes('@')) {
+          emailInput.value = val + '@sipena.com';
+        }
+      });
+    });
+  </script>
+
   
 </body>
 

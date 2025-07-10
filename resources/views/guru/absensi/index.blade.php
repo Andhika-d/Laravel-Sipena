@@ -9,7 +9,7 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1>Dashboard - SIPENA</h1>
+          <h1>Absensi - SIPENA</h1>
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -61,7 +61,13 @@
                             <td style="width: 1px" class="px-2">
                               :
                             </td>
-                            <td>{{ $guru->mengajar }}</td>
+                            <td>
+                              @if ($guru->mapel && $guru->mapel->count())
+                                {{ $guru->mapel->pluck('nama_mapel')->join(', ') }}
+                              @else
+                                -
+                              @endif
+                            </td>
                           </tr>
                           <tr>
                             <td style="font-weight: bold !important;">Kelas</td>
@@ -69,21 +75,6 @@
                               :
                             </td>
                             <td>{{ $guru->kelas->nama ?? '-' }}</td>
-                          </tr>
-                          <tr>
-                            <td style="font-weight: bold !important;">QR Code</td>
-                            <td style="width: 1px" class="px-2">
-                              :
-                            </td>
-                            <td>
-                              <a
-                                href="#"
-                                class="text-primary "
-                                target="_blank"
-                              >
-                                Download
-                              </a>
-                            </td>
                           </tr>
                         </tbody>
                       </table>
@@ -93,188 +84,220 @@
               </div>
             </div>
           </div>
+
           <!-- Absen Manual -->
           <div class="card-body">
             <div class="row">
               <div class="col">
-                <div class="text-center" style="font-weight: bold !important;">PILIH ABSEN </div>
+                <div class="text-center" style="font-weight: bold !important;">PILIH ABSEN</div>
+                @if (!$absenHariIni)
+                <button type="button" class="btn btn-sm btn-outline-secondary float-left" data-toggle="modal" data-target="#izinModal">
+                  <i class="fas fa-notes-medical"></i> Izin/Sakit
+                </button>
+              @else
+                <button type="button" class="btn btn-sm btn-outline-secondary float-left" disabled>
+                  <i class="fas fa-notes-medical"></i> Sudah Absen
+                </button>
+              @endif
               </div>
             </div>
+
             <div class="row my-3">
-            {{-- ABSEN MASUK / TELAT --}}
-            <div class="col-md-6">
-              @if ($now->lt($jamMasukMulai))
-                {{-- Belum waktu absen --}}
-                <div class="info-box">
-                  <span class="info-box-icon bg-primary elevation-1">
-                    <i class="fas fa-user-tie"></i>
-                  </span>
-                  <div class="info-box-content">
-                    <span class="info-box-number">Absen Masuk (Manual)</span>
-                    <small class="text-muted">
-                      <i class="fa fa-clock"></i> 06.00 - 08.00 WIB
-                    </small>
+              {{-- ABSEN MASUK / TELAT --}}
+              <div class="col-md-6" id="absen-masuk">
+                @if ($absenHariIni && in_array($absenHariIni->status_kehadiran, ['izin', 'sakit']))
+                  {{-- Sudah Izin / Sakit --}}
+                  <div class="info-box">
+                    <span class="info-box-icon elevation-1">
+                      <i class="fas fa-user-slash"></i>
+                    </span>
+                    <div class="info-box-content">
+                      <span class="info-box-number">Tidak Perlu Absen</span>
+                      <small class="text-muted">Anda mengajukan {{ $absenHariIni->status_kehadiran }} hari ini</small>
+                    </div>
                   </div>
-                </div>
-              @elseif ($now->between($jamMasukMulai, $jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
-                {{-- Absen Masuk --}}
-                <form method="POST" action="{{ route('guru.absen.masuk') }}">
-                  @csrf
-                  <input type="hidden" name="latitude" id="latitude">
-                  <input type="hidden" name="longitude" id="longitude">
-                  <button type="submit" class="info-box btn btn-link p-0 text-left " style="border:none; background:none;">
+
+                  @elseif ((!$absenHariIni || !$absenHariIni->jam_masuk) && $now->gt(\Carbon\Carbon::createFromTime(15, 0)))
+                  {{-- Terlambat Absen dan Lewat dari jam 15.00: Absen dikunci --}}
+                  <div class="info-box">
+                    <span class="info-box-icon bg-secondary elevation-1">
+                      <i class="fas fa-user-lock"></i>
+                    </span>
+                    <div class="info-box-content">
+                      <span class="info-box-number">Absen Masuk (Terkunci)</span>
+                      <small class="text-muted">
+                        <i class="fa fa-clock"></i> Anda tidak melakukan absen sebelum pukul 15.00
+                      </small>
+                    </div>
+                  </div>
+
+                @elseif ($now->lt($jamMasukMulai))
+                  {{-- Belum waktu absen --}}
+                  <div class="info-box">
                     <span class="info-box-icon bg-primary elevation-1">
                       <i class="fas fa-user-tie"></i>
                     </span>
                     <div class="info-box-content">
                       <span class="info-box-number">Absen Masuk (Manual)</span>
-                      <small class="text-success">
-                        <i class="fa fa-check-circle"></i> Klik untuk Absen Masuk
-                      </small>
-                      <small class="text-danger location-warning d-none">
-                          <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
+                      <small class="text-muted">
+                        <i class="fa fa-clock"></i> 06.00 - 08.00 WIB
                       </small>
                     </div>
-                  </button>
-                </form>
+                  </div>
+
+                @elseif ($now->between($jamMasukMulai, $jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
+                  {{-- Absen Masuk --}}
+                  <form method="POST" action="{{ route('guru.absen.masuk') }}">
+                    @csrf
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <button type="submit" class="info-box btn btn-link p-0 text-left " style="border:none; background:none;">
+                      <span class="info-box-icon bg-primary elevation-1">
+                        <i class="fas fa-user-tie"></i>
+                      </span>
+                      <div class="info-box-content">
+                        <span class="info-box-number">Absen Masuk (Manual)</span>
+                        <small class="text-success">
+                          <i class="fa fa-check-circle"></i> Klik untuk Absen Masuk
+                        </small>
+                        <small class="text-danger location-warning d-none">
+                          <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
+                        </small>
+                      </div>
+                    </button>
+                  </form>
+
                 @elseif ($now->gt($jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
-                {{-- Telat --}}
-                <form method="POST" action="{{ route('guru.absen.masuk') }}">
-                  @csrf
-                  <input type="hidden" name="latitude" id="latitude">
-                  <input type="hidden" name="longitude" id="longitude">
-                  <button type="submit" class="info-box btn btn-link p-0 text-left" style="border:none; background:none;">
-                    <span class="info-box-icon bg-warning elevation-1">
-                      <i class="fas fa-user-tie"></i>
-                    </span>
-                    <div class="info-box-content">
-                      <span class="info-box-number">Absen Telat</span>
-                      <small class="text-warning">
-                        <i class="fa fa-exclamation-circle"></i> Klik untuk Absen Telat
-                      </small>
-                      <small class="text-danger location-warning d-none">
+                  {{-- Telat --}}
+                  <form method="POST" action="{{ route('guru.absen.masuk') }}">
+                    @csrf
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <button type="submit" class="info-box btn btn-link p-0 text-left" style="border:none; background:none;">
+                      <span class="info-box-icon bg-warning elevation-1">
+                        <i class="fas fa-user-tie"></i>
+                      </span>
+                      <div class="info-box-content">
+                        <span class="info-box-number">Absen Telat</span>
+                        <small class="text-warning">
+                          <i class="fa fa-exclamation-circle"></i> Klik untuk Absen Telat
+                        </small>
+                        <small class="text-danger location-warning d-none">
                           <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
+                        </small>
+                      </div>
+                    </button>
+                  </form>
+
+                @else
+                  {{-- Sudah Absen --}}
+                  <div class="info-box">
+                    <span class="info-box-icon bg-success elevation-1">
+                      <i class="fas fa-user-check"></i>
+                    </span>
+                    <div class="info-box-content">
+                      <span class="info-box-number">
+                        {{ $absenHariIni->is_telat ? 'Sudah Absen Telat' : 'Sudah Absen Masuk' }}
+                      </span>
+                      <small class="text-muted">
+                        <i class="fa fa-check"></i> {{ $absenHariIni->jam_masuk->format('H:i') }}
                       </small>
                     </div>
-                  </button>
-                </form>
-              @else
-                {{-- Sudah Absen --}}
-                <div class="info-box">
-                  <span class="info-box-icon bg-success elevation-1">
-                    <i class="fas fa-user-check"></i>
-                  </span>
-                  <div class="info-box-content">
-                    <span class="info-box-number">
-                      {{ $absenHariIni->is_telat ? 'Sudah Absen Telat' : 'Sudah Absen Masuk' }}
+                  </div>
+                @endif
+              </div>
+
+              {{-- ABSEN PULANG --}}
+              <div class="col-md-6" id="absen-pulang">
+                @php
+                  $sudahAbsenMasuk = $absenHariIni && $absenHariIni->jam_masuk;
+                  $sudahAbsenPulang = $absenHariIni && $absenHariIni->jam_pulang;
+                @endphp
+
+                @if ($absenHariIni && in_array($absenHariIni->status_kehadiran, ['izin', 'sakit']))
+                  {{-- Sudah Izin / Sakit --}}
+                  <div class="info-box">
+                    <span class="info-box-icon elevation-1">
+                      <i class="fas fa-user-slash"></i>
                     </span>
-                    <small class="text-muted">
-                      <i class="fa fa-check"></i> {{ $absenHariIni->jam_masuk->format('H:i') }}
-                    </small>
+                    <div class="info-box-content">
+                      <span class="info-box-number">Tidak Perlu Absen Pulang</span>
+                      <small class="text-muted">Izin/Sakit: otomatis terkunci</small>
+                    </div>
                   </div>
-                </div>
-              @endif
-            </div>
-            {{-- ABSEN PULANG --}}
-            <div class="col-md-6">
-              @php
-                $sudahAbsenMasuk = $absenHariIni && $absenHariIni->jam_masuk;
-                $sudahAbsenPulang = $absenHariIni && $absenHariIni->jam_pulang;
-              @endphp
 
-              @if (!$sudahAbsenMasuk)
-                {{-- Belum Absen Masuk --}}
-                <div class="info-box">
-                  <span class="info-box-icon bg-secondary elevation-1">
-                    <i class="fas fa-user-tie"></i>
-                  </span>
-                  <div class="info-box-content">
-                    <span class="info-box-number">Absen Pulang (Terkunci)</span>
-                    <small class="text-muted"><i class="fa fa-clock"></i> Belum Absen Masuk</small>
-                  </div>
-                </div>
-
-              @elseif ($now->lt($jamPulang))
-                {{-- Sudah Absen Masuk tapi Belum Waktu Pulang --}}
-                <div class="info-box">
-                  <span class="info-box-icon bg-secondary elevation-1">
-                    <i class="fas fa-user-tie"></i>
-                  </span>
-                  <div class="info-box-content">
-                    <span class="info-box-number">Absen Pulang (Terkunci)</span>
-                    <small class="text-muted"><i class="fa fa-clock"></i> Belum Waktu Pulang</small>
-                  </div>
-                </div>
-
-              @else
-                {{-- Sudah Waktu Pulang --}}
-                <form method="POST" action="{{ route('guru.absen.pulang') }}">
-                  @csrf
-                  <input type="hidden" name="latitude" id="latitude">
-                  <input type="hidden" name="longitude" id="longitude">
-                  <button type="submit"
-                    class="info-box btn btn-link p-0 text-left"
-                    style="border: none; background: none;"
-                    {{ $sudahAbsenPulang ? 'disabled' : '' }}>
-
-                    <span class="info-box-icon bg-danger elevation-1">
+                @elseif (!$sudahAbsenMasuk)
+                  {{-- Belum Absen Masuk --}}
+                  <div class="info-box">
+                    <span class="info-box-icon bg-secondary elevation-1">
                       <i class="fas fa-user-tie"></i>
                     </span>
                     <div class="info-box-content">
-                      <span class="info-box-number">Absen Pulang</span>
-                      <small class="{{ $sudahAbsenPulang ? 'text-success' : 'text-danger' }}">
-                        <i class="fa fa-check-circle"></i>
-                        {{ $sudahAbsenPulang ? 'Sudah Absen Pulang' : 'Belum Absen' }}
-                      </small>
-                    </div>
-                  </button>
-                </form>
-              @endif
-            </div>
-            </div>
-            <!-- Absen QR -->
-            <!-- <div class="row my-3">
-              <div class="col-md-6">
-                <a href="#">
-                  <div class="info-box">
-                    <span class="info-box-icon bg-primary elevation-1">
-                      <i class="fas fa-camera"></i>
-                    </span>
-                    <div class="info-box-content">
-                      <span class="info-box-number">Absen Masuk (QR)</span>
-                      <small class="text-danger">
-                        <i class="fa fa-question-circle"></i>
-                        Belum Absen
-                      </small>
+                      <span class="info-box-number">Absen Pulang (Terkunci)</span>
+                      <small class="text-muted"><i class="fa fa-clock"></i> Belum Absen Masuk</small>
                     </div>
                   </div>
-                </a>
-              </div>
 
-              <div class="col-md-6">
-                <a href="#">
+                @elseif ($now->lt($jamPulang))
+                  {{-- Sudah Absen Masuk tapi Belum Waktu Pulang --}}
                   <div class="info-box">
-                    <span class="info-box-icon bg-primary elevation-1">
-                      <i class="fas fa-camera"></i>
+                    <span class="info-box-icon bg-secondary elevation-1">
+                      <i class="fas fa-user-tie"></i>
                     </span>
                     <div class="info-box-content">
-                      <span class="info-box-number">Absen Pulang</span>
-                      <small class="text-danger">
-                        <i class="fa fa-question-circle"></i>
-                        Belum Absen
+                      <span class="info-box-number">Absen Pulang (Terkunci)</span>
+                      <small class="text-muted"><i class="fa fa-clock"></i> Belum Waktu Pulang</small>
+                    </div>
+                  </div>
+
+                @else
+                  {{-- Sudah Waktu Pulang --}}
+                  @if ($sudahAbsenPulang)
+                  {{-- TAMPILAN JIKA SUDAH ABSEN PULANG --}}
+                  <div class="info-box">
+                    <span class="info-box-icon bg-success elevation-1">
+                      <i class="fas fa-user-check"></i>
+                    </span>
+                    <div class="info-box-content">
+                      <span class="info-box-number">Sudah Absen Pulang</span>
+                      <small class="text-muted">
+                        <i class="fa fa-check"></i> {{ $absenHariIni->jam_pulang->format('H:i') }}
                       </small>
                     </div>
                   </div>
-                </a>
+                  @else
+                    {{-- TAMPILAN JIKA BELUM ABSEN PULANG --}}
+                    <form method="POST" action="{{ route('guru.absen.pulang') }}">
+                      @csrf
+                      <input type="hidden" name="latitude" id="latitude">
+                      <input type="hidden" name="longitude" id="longitude">
+                      <button type="submit"
+                        class="info-box btn btn-link p-0 text-left"
+                        style="border: none; background: none;">
+                        <span class="info-box-icon bg-danger elevation-1">
+                          <i class="fas fa-user-tie"></i>
+                        </span>
+                        <div class="info-box-content">
+                          <span class="info-box-number">Absen Pulang</span>
+                          <small class="text-danger">
+                            <i class="fa fa-check-circle"></i> Belum Absen
+                          </small>
+                        </div>
+                      </button>
+                    </form>
+                  @endif
+                @endif
               </div>
-            </div> -->
+            </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
   </section>
-  <!-- Modal -->
+
+  <!-- Modal Info -->
   <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
@@ -311,6 +334,28 @@
             <i class="fas fa-info-circle"></i> Hanya bisa absen masuk <strong>sekali per hari</strong>.
           </p>
           
+          @if ($absenHariIni)
+          <div class="mt-3 d-flex align-items-center">
+            <i class="fas fa-user-check mr-2 text-info"></i>
+            <div>
+              <span class="text-muted">Status absensi hari ini:</span><br>
+              @if ($absenHariIni->status_kehadiran === 'izin')
+                <span class="badge badge-warning"><i class="fas fa-notes-medical"></i> Izin</span>
+              @elseif ($absenHariIni->status_kehadiran === 'sakit')
+                <span class="badge badge-warning"><i class="fas fa-bed"></i> Sakit</span>
+              @elseif ($absenHariIni->jam_masuk)
+                @if ($absenHariIni->is_telat)
+                  <span class="badge badge-danger"><i class="fas fa-clock"></i> Telat - {{ $absenHariIni->jam_masuk->format('H:i') }}</span>
+                @else
+                  <span class="badge badge-success"><i class="fas fa-check-circle"></i> Hadir - {{ $absenHariIni->jam_masuk->format('H:i') }}</span>
+                @endif
+              @else
+                <span class="badge badge-secondary">Belum Absen</span>
+              @endif
+            </div>
+          </div>
+        @endif
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -319,92 +364,149 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Izin / Sakit -->
+  <div class="modal fade" id="izinModal" tabindex="-1" role="dialog" aria-labelledby="izinModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalIzinSakitLabel">Izin/Sakit</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('guru.absen.izin') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+
+          <!-- Nama Guru (readonly dropdown look) -->
+          <div class="form-group mb-3">
+            <label for="guru_id">Nama Guru</label>
+            <select class="form-control" disabled>
+              <option>{{ Auth::user()->guru->nama }}</option>
+            </select>
+          </div>
+
+          <!-- user_id dikirim sebagai hidden -->
+          <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+
+          <!-- Tanggal -->
+          <div class="form-group">
+            <label for="tanggal">Tanggal</label>
+            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+          </div>
+
+          <!-- Jenis Izin -->
+          <div class="form-group">
+            <label for="status_kehadiran">Jenis Izin</label>
+            <select class="form-control" id="status_kehadiran" name="status_kehadiran" required>
+              <option value="">-- Pilih --</option>
+              <option value="izin">Izin</option>
+              <option value="sakit">Sakit</option>
+            </select>
+          </div>
+
+          <!-- Deskripsi -->
+          <div class="form-group">
+            <label for="deskripsi">Keterangan</label>
+            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Tuliskan keterangan tambahan (opsional)"></textarea>
+          </div>
+
+          <!-- File Bukti -->
+          <div class="form-group">
+            <label for="file_pendukung">Upload Bukti (jika ada)</label>
+            <input type="file" class="form-control-file" id="file_pendukung" name="file_pendukung">
+          </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-primary">Kirim</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script id="lokasi-kantor" type="application/json">
+  {!! json_encode($lokasiKantor) !!}
+</script>
+
 <script>
+  const lokasiKantor = JSON.parse(
+    document.getElementById("lokasi-kantor").textContent
+  );
+
   document.addEventListener("DOMContentLoaded", function () {
     if (navigator.geolocation) {
-      // Script Temu Lokasi
-      // navigator.geolocation.getCurrentPosition(
-      // function(position) {
-      //   const latitude = position.coords.latitude;
-      //   const longitude = position.coords.longitude;
-      //   console.log("Lokasi lo sekarang:", latitude, longitude); // Tambahin ini
-      // },
-      // function(error) {
-      //   console.error("Gagal dapet lokasi:", error); // Buat liat errornya
-      // }
-      // );
       navigator.geolocation.getCurrentPosition(
         function (position) {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
-          
+          const accuracy = position.coords.accuracy;
 
-          // Set ke input hidden
+          console.log("Akurasi lokasi:", accuracy + " meter");
+
           document.getElementById("latitude").value = userLat;
           document.getElementById("longitude").value = userLng;
 
-          // Lokasi sekolah/kantor (ganti dengan koordinat aslinya nanti)
-          const kantorLat = -6.0757615; // latitude
-          const kantorLng = 106.0934919; // longitude
+          const distance = getDistanceFromLatLonInKm(
+            lokasiKantor.latitude,
+            lokasiKantor.longitude,
+            userLat,
+            userLng
+          );
 
-          const distance = getDistanceFromLatLonInMeters(userLat, userLng, kantorLat, kantorLng);
+          // Menentukan batas radius lokasi kantor (misalnya 0.2 km = 200 meter)
+          const radiusMaksimum = 0.2;
 
-          // Optional: validasi jarak maksimal (contoh: 100 meter)
-          const maxDistance = 800;
+          if (distance > radiusMaksimum) {
+            document.querySelectorAll(".location-warning").forEach(el => {
+              el.classList.remove("d-none");
+            });
 
-          console.log("Lokasi user:", userLat, userLng);
-          console.log("Lokasi kantor:", kantorLat, kantorLng);
-          console.log("Jarak ke kantor:", distance, "meter");
-
-          if (distance > maxDistance) {
-          window.isLocationValid = false;
-
-          document.querySelectorAll('form button[type="submit"]').forEach(btn => {
-            // Sembunyikan tombolnya biar ga bikin layout aneh
-            btn.closest('form').classList.add('d-none');
-          });
-
-          // Tampilkan card khusus “di luar area”
-          const lokasiInvalidBox = document.createElement('div');
-          lokasiInvalidBox.className = 'info-box';
-          lokasiInvalidBox.innerHTML = `
-            <span class="info-box-icon bg-danger">
-              <i class="fas fa-map-marker-alt"></i>
-            </span>
-            <div class="info-box-content">
-              <span class="info-box-number text-danger">Lokasi Tidak Valid</span>
-              <small class="text-muted">
-                Kamu berada di luar area Sekolah (${maxDistance}m)
-              </small>
-            </div>
-          `;
-
-          const targetCol = document.querySelector('.col-md-6'); // ganti selector biar tepat
-          targetCol.appendChild(lokasiInvalidBox);
-        }
+            // Nonaktifkan tombol submit absensi jika di luar lokasi
+            document.querySelectorAll("form[action*='absen']").forEach(form => {
+              const button = form.querySelector("button[type='submit']");
+              if (button) {
+                button.disabled = true;
+              }
+            });
+          }
         },
         function (error) {
-          alert("Gagal mengambil lokasi. Pastikan kamu mengizinkan akses lokasi di browser.");
-        });
+          console.error("Gagal mendapatkan lokasi:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
     } else {
-      alert("Browser tidak mendukung Geolocation.");
-    }
-
-    function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-      const R = 6371e3; // Radius bumi dalam meter
-      const φ1 = lat1 * Math.PI / 180;
-      const φ2 = lat2 * Math.PI / 180;
-      const Δφ = (lat2 - lat1) * Math.PI / 180;
-      const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-                Math.cos(φ1) * Math.cos(φ2) *
-                Math.sin(Δλ/2) * Math.sin(Δλ/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-      const d = R * c;
-      return d;
+      console.error("Geolocation tidak didukung oleh browser ini.");
     }
   });
+
+  function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius bumi dalam KM
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Jarak dalam KM
+    return d;
+  }
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
 </script>
 @endsection

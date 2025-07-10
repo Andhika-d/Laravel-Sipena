@@ -5,7 +5,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="{{ route('guru.dashboard') }}" class="nav-link">Home</a>
+        <a href="{{ route('kepsek.dashboard') }}" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link"></a>
@@ -51,7 +51,7 @@
 </nav>
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="{{ route('guru.dashboard') }}" class="brand-link">
+    <a href="{{ route('kepsek.dashboard') }}" class="brand-link">
     <img src="{{ asset('images/LogoGuru.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text font-weight-light">SIPENA</span>
     </a>
@@ -76,25 +76,18 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item">
-            <a href="{{ route('guru.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('kepsek.dashboard') }}" class="nav-link {{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">
               <i class="nav-icon fas fa-home"></i>
               <p>Home</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ route('guru.absensi') }}" 
-            class="nav-link {{ request()->routeIs('guru.absensi') ? 'active' : '' }}">
-              <i class="fas fa-address-card nav-icon"></i>
-              <p>Absensi</p>
-            </a>
+              <a href="{{ route('kepsek.rekap') }}" class="nav-link {{ request()->routeIs('kepsek.rekap') ? 'active' : '' }}">
+                  <i class="nav-icon fas fa-clipboard-list"></i>
+                  <p>Rekap Absensi</p>
+              </a>
           </li>
-          <li class="nav-item">
-            <a href="{{ route('guru.penilaian') }}" 
-            class="nav-link {{ request()->routeIs('guru.penilaian') ? 'active' : '' }}">
-              <i class="fas fa-newspaper nav-icon"></i>
-              <p>Penilaian</p>
-            </a>
-          </li>
+
           <li class="nav-item">
             <a href="#" class="nav-link" data-toggle="modal" data-target="#logoutModal" 
             class="nav-link">

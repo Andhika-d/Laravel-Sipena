@@ -83,4 +83,52 @@ class PenilaianController extends Controller
 
         return redirect()->route('guru.penilaian')->with('success', 'Data nilai berhasil dihapus.');
     }
+
+    public function rekap(Request $request)
+    {
+        $request->validate([
+            'kelas_id' => 'required|exists:kelas,id',
+            'mapel_id' => 'required|exists:mapel,id',
+        ]);
+
+        $kelas = Kelas::findOrFail($request->kelas_id);
+        $mapel = Mapel::findOrFail($request->mapel_id);
+
+        $data = NilaiHarian::whereHas('siswa', function ($query) use ($kelas) {
+                        $query->where('kelas_id', $kelas->id);
+                    })
+                    ->where('mapel_id', $mapel->id)
+                    ->with(['siswa.kelas', 'mapel'])
+                    ->orderBy('tanggal', 'asc')
+                    ->get();
+
+        $filename = 'rekap_nilai_' . strtolower(str_replace(' ', '_', $kelas->nama)) . '_' . strtolower(str_replace(' ', '_', $mapel->nama_mapel)) . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () use ($data) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['No', 'Nama Siswa', 'Kelas', 'Mapel', 'Tanggal', 'Deskripsi', 'Nilai']);
+
+            foreach ($data as $i => $nilai) {
+                fputcsv($handle, [
+                    $i + 1,
+                    $nilai->siswa->nama,
+                    $nilai->siswa->kelas->nama,
+                    $nilai->mapel->nama_mapel,
+                    \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-Y'),
+                    $nilai->deskripsi ?? '-',
+                    $nilai->nilai
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

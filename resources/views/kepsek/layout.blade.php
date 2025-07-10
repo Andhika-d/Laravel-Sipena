@@ -38,7 +38,7 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
-    @include('guru.sidebar')
+    @include('kepsek.sidebar')
 
     @yield('content')
   </div>
