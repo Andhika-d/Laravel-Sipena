@@ -5,9 +5,9 @@
     <title>Login - SIPENA</title>
 
     <!-- Bootstrap & AdminLTE -->
-    <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ auto_asset('dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ auto_asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ auto_asset('plugins/fontawesome-free/css/all.min.css') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
@@ -39,7 +39,6 @@
         }
 
         .school-bg {
-        background-image: url("{{ asset('images/school-pattern.png') }}");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
@@ -98,8 +97,8 @@
 </div>
 
 <!-- JS Files -->
-<script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
-<script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
+<script src="{{ auto_asset('plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ auto_asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ auto_asset('dist/js/adminlte.min.js') }}"></script>
 </body>
 </html>

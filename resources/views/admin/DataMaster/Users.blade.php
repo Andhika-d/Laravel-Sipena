@@ -113,37 +113,39 @@
               </div>
               </div>
 
-              <!-- Default Table -->
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Akun dibuat</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                @foreach ($users as $index => $user)
-                  <tr>
-                    <th scope="row">{{ $index + 1 }}</th>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->created_at->format('d M Y') }}</td>
-                    <td>
-                      <a href="#" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pencil-square"></i>
-                      </a>
-                      <a href="#" class="btn btn-sm btn-danger">
-                        <i class="bi bi-trash"></i>
-                      </a>
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-              </table>
-              <!-- End Default Table Example -->
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr class="align-middle">
+                      <th scope="col">No</th>
+                      <th scope="col">Nama</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Akun dibuat</th>
+                      <th scope="col">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($users as $index => $user)
+                    <tr>
+                      <th scope="row">{{ $index + 1 }}</th>
+                      <td>{{ $user->name }}</td>
+                      <td>{{ $user->email }}</td>
+                      <td>{{ $user->created_at->format('d M Y') }}</td>
+                      <td class="align-middle">
+                        <div class="d-flex justify-content-center gap-1 flex-wrap">
+                          <a href="#" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil-square"></i>
+                          </a>
+                          <a href="#" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
       </div>

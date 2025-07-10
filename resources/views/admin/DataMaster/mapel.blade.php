@@ -54,18 +54,20 @@
             <tr>
               <td>{{ $index + 1 }}</td>
               <td>{{ $mapel->nama_mapel }}</td>
-              <td>
+              <td class="align-middle" style="min-width: 100px;">
+              <div class="d-flex flex-wrap gap-1">
                 <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditMapel{{ $mapel->id }}">
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                <form action="{{ route('admin.mapel.destroy', $mapel->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus?')">
+                <form action="{{ route('admin.mapel.destroy', $mapel->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?')">
                   @csrf
                   @method('DELETE')
                   <button class="btn btn-sm btn-danger">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
-              </td>
+              </div>
+            </td>
             </tr>
 
             <!-- Modal Edit -->

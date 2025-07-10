@@ -31,7 +31,6 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title" style="font-weight: bold !important;">Table Penilaian Siswa</h3>
 
                 <div class="d-flex align-items-center ml-auto">
                   <!-- Search box -->
