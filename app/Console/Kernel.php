@@ -7,12 +7,9 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('tandai:alfa')->dailyAt('15:01');
+        $schedule->command('tandai:alfa')->dailyAt('15:05');
     }
 
     protected function commands(): void

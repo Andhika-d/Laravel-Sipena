@@ -35,10 +35,13 @@
                     <div class="table-responsive">
                       <div class="position-relative mb-3">
                       <!-- Tombol Info -->
-                      <button type="button" class="btn btn-sm btn-light text-info position-absolute" 
-                              style="top: 0; right: 0; z-index: 1;" 
-                              data-toggle="modal" data-target="#infoModal">
-                        <i class="fas fa-info-circle"> Info</i>
+                      <button type="button"
+                              class="btn bg-transparent text-info position-absolute d-flex align-items-center justify-content-center gap-1"
+                              style="top: 0; right: 0; padding: 0 0.5rem; border-radius: 999px;"
+                              data-toggle="modal"
+                              data-target="#infoModal"
+                              title="Info">
+                        <i class="fas fa-info-circle"></i>
                       </button>
                       <table class="table-borderless">
                         <tbody>
@@ -91,11 +94,11 @@
               <div class="col">
                 <div class="text-center" style="font-weight: bold !important;">PILIH ABSEN</div>
                 @if (!$absenHariIni)
-                <button type="button" class="btn btn-sm btn-outline-secondary float-left" data-toggle="modal" data-target="#izinModal">
+                <button type="button" class="btn btn-sm btn-outline-secondary float-left mt-4 mt-md-2" data-toggle="modal" data-target="#izinModal">
                   <i class="fas fa-notes-medical"></i> Izin/Sakit
                 </button>
               @else
-                <button type="button" class="btn btn-sm btn-outline-secondary float-left" disabled>
+                <button type="button" class="btn btn-sm btn-outline-secondary float-left mt-4 mt-md-2" disabled>
                   <i class="fas fa-notes-medical"></i> Sudah Absen
                 </button>
               @endif
@@ -138,7 +141,7 @@
                       <i class="fas fa-user-tie"></i>
                     </span>
                     <div class="info-box-content">
-                      <span class="info-box-number">Absen Masuk (Manual)</span>
+                      <span class="info-box-number">Absen Masuk</span>
                       <small class="text-muted">
                         <i class="fa fa-clock"></i> 06.00 - 08.00 WIB
                       </small>
@@ -146,17 +149,19 @@
                   </div>
 
                 @elseif ($now->between($jamMasukMulai, $jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
-                  {{-- Absen Masuk --}}
-                  <form method="POST" action="{{ route('guru.absen.masuk') }}">
-                    @csrf
-                    <input type="hidden" name="latitude" id="latitude">
-                    <input type="hidden" name="longitude" id="longitude">
-                    <button type="submit" class="info-box btn btn-link p-0 text-left " style="border:none; background:none;">
+                {{-- Absen Masuk --}}
+                <form method="POST" action="{{ route('guru.absen.masuk') }}">
+                  @csrf
+                  <input type="hidden" name="latitude" id="latitude">
+                  <input type="hidden" name="longitude" id="longitude">
+
+                  <button id="btn-absen-masuk" type="submit" class="w-100 p-0 m-0 text-left" style="border: none; background: none;">
+                    <div class="info-box">
                       <span class="info-box-icon bg-primary elevation-1">
                         <i class="fas fa-user-tie"></i>
                       </span>
-                      <div class="info-box-content">
-                        <span class="info-box-number">Absen Masuk (Manual)</span>
+                      <div class="info-box-content text-start">
+                        <span class="info-box-number">Absen Masuk</span>
                         <small class="text-success">
                           <i class="fa fa-check-circle"></i> Klik untuk Absen Masuk
                         </small>
@@ -164,20 +169,23 @@
                           <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
                         </small>
                       </div>
-                    </button>
-                  </form>
+                    </div>
+                  </button>
+                </form>
 
                 @elseif ($now->gt($jamMasukSelesai) && (!$absenHariIni || !$absenHariIni->jam_masuk))
-                  {{-- Telat --}}
-                  <form method="POST" action="{{ route('guru.absen.masuk') }}">
-                    @csrf
-                    <input type="hidden" name="latitude" id="latitude">
-                    <input type="hidden" name="longitude" id="longitude">
-                    <button type="submit" class="info-box btn btn-link p-0 text-left" style="border:none; background:none;">
+                {{-- Telat --}}
+                <form method="POST" action="{{ route('guru.absen.masuk') }}">
+                  @csrf
+                  <input type="hidden" name="latitude" id="latitude">
+                  <input type="hidden" name="longitude" id="longitude">
+
+                  <button id="btn-absen-telat" type="submit" class="w-100 p-0 m-0 text-left" style="border: none; background: none;">
+                    <div class="info-box">
                       <span class="info-box-icon bg-warning elevation-1">
                         <i class="fas fa-user-tie"></i>
                       </span>
-                      <div class="info-box-content">
+                      <div class="info-box-content text-start">
                         <span class="info-box-number">Absen Telat</span>
                         <small class="text-warning">
                           <i class="fa fa-exclamation-circle"></i> Klik untuk Absen Telat
@@ -186,8 +194,9 @@
                           <i class="fa fa-map-marker-alt"></i> Kamu berada di luar area absen
                         </small>
                       </div>
-                    </button>
-                  </form>
+                    </div>
+                  </button>
+                </form>
 
                 @else
                   {{-- Sudah Absen --}}
@@ -313,21 +322,26 @@
           <ul class="list-group mb-3">
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <strong>Absen Masuk</strong>
-              <span class="badge badge-primary badge-pill">06:00 – 08:00 WIB</span>
+              <span class="badge badge-primary badge-pill pulse-badge">06:00 – 08:00 WIB</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <strong>Absen Telat</strong>
-              <span class="badge badge-warning badge-pill">Setelah 08:00 WIB</span>
+              <span class="badge badge-warning badge-pill pulse-badge">Setelah 08:00 WIB</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <strong>Absen Pulang</strong>
-              <span class="badge badge-success badge-pill">Setelah 14:00 WIB</span>
+              <span class="badge badge-success badge-pill pulse-badge">Setelah 14:00 WIB</span>
             </li>
           </ul>
 
           <div class="alert alert-info" role="alert">
             <i class="fas fa-exclamation-circle"></i>
             Guru yang sudah menekan atau scan <strong>Absen Masuk</strong> / <strong>Telat</strong> wajib menekan / scan <strong>Absen Pulang</strong> agar kehadiran terverifikasi.
+          </div>
+
+          <div class="alert alert-danger mt-3" role="alert">
+            <i class="fas fa-times-circle"></i>
+            Guru yang belum absen hingga <strong>15:00 WIB</strong> akan dianggap <strong>tidak hadir (alfa)</strong>.
           </div>
 
           <p class="text-muted mb-0">
@@ -467,11 +481,18 @@
               el.classList.remove("d-none");
             });
 
-            // Nonaktifkan tombol submit absensi jika di luar lokasi
-            document.querySelectorAll("form[action*='absen']").forEach(form => {
+            const forms = document.querySelectorAll("form[action*='absen']");
+            forms.forEach(form => {
+              form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                alert("Gagal absen: Anda berada di luar radius kantor.");
+              });
+
               const button = form.querySelector("button[type='submit']");
               if (button) {
                 button.disabled = true;
+                button.style.cursor = "not-allowed";
+                button.title = "Lokasi kamu di luar radius";
               }
             });
           }

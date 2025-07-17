@@ -53,6 +53,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
   //Buat Akun Guru
   Route::get('/guru-akun/create', [GuruAkunController::class, 'create'])->name('admin.guru-akun.create');
   Route::post('/guru-akun', [GuruAkunController::class, 'store'])->name('admin.guru-akun.store');
+  Route::put('/guru-akun/{id}', [GuruAkunController::class, 'update'])->name('admin.guru-akun.update');
+  Route::delete('/guru-akun/{id}', [GuruAkunController::class, 'destroy'])->name('admin.guru-akun.destroy');
+
 
   // Kelas CRUD
   Route::resource('kelas', KelasController::class)->names('admin.kelas');

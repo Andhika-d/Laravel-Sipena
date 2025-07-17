@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ auto_asset('dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ auto_asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ auto_asset('plugins/fontawesome-free/css/all.min.css') }}">
+    <link href="{{ asset('images/favicon-32x32.png') }}" rel="icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>

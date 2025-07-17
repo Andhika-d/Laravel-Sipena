@@ -22,22 +22,33 @@ class TandaiAlfaGuru extends Command
             return;
         }
 
+        // Ambil ID guru yang sudah absen hari ini
         $guruIdsYangSudahAbsen = AbsensiGuru::whereDate('tanggal', $today)->pluck('user_id')->toArray();
 
-        $guruBelumAbsen = User::whereHas('guru')
-            ->whereNotIn('id', $guruIdsYangSudahAbsen)
-            ->get();
+        // Ambil data guru yang belum absen
+        $guruBelumAbsen = User::where('role', 'guru')
+        ->whereHas('guru')
+        ->whereNotIn('id', $guruIdsYangSudahAbsen)
+        ->get();
+
+        $jumlahDitandai = 0;
 
         foreach ($guruBelumAbsen as $guru) {
-            AbsensiGuru::create([
-                'user_id' => $guru->id,
-                'tanggal' => $today,
-                'status_kehadiran' => 'alfa',
-                'is_telat' => false,
-                'status_verifikasi' => false,
-            ]);
+            AbsensiGuru::updateOrCreate(
+                [
+                    'user_id' => $guru->id,
+                    'tanggal' => $today,
+                ],
+                [
+                    'status_kehadiran' => 'alfa',
+                    'is_telat' => false,
+                    'status_verifikasi' => false,
+                ]
+            );
+
+            $jumlahDitandai++;
         }
 
-        $this->info("Total guru ditandai alfa: " . count($guruBelumAbsen));
+        $this->info("Total guru ditandai alfa: $jumlahDitandai");
     }
 }

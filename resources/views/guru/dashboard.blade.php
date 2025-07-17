@@ -8,7 +8,7 @@
   <section class="content-header">
     <div class="container-fluid">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h1 class="m-0">Selamat Datang, {{ $namaGuru }}</h1>
+        <h1 class="m-0">Dashboard</h1>
         <ol class="breadcrumb float-sm-right">
           <li class="breadcrumb-item"><a href="{{ route('guru.dashboard') }}">Dashboard</a></li>
           <li class="breadcrumb-item active">Beranda</li>
@@ -23,7 +23,10 @@
       <!-- Welcome Card -->
       <div class="card card-primary card-outline">
         <div class="card-header">
-          <h3 class="card-title"><i class="fas fa-info-circle mr-1"></i> Informasi SIPENA</h3>
+          <h3 class="card-title d-flex align-items-center">
+            <i class="fas fa-info-circle mr-2" style="font-size: 1.1em;"></i>
+            <span class="typing-css">Informasi SIPENA</span>
+          </h3>
         </div>
         <div class="card-body row">
           <div class="col-md-6">

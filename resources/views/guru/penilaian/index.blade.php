@@ -81,7 +81,28 @@
                         <td>{{ $nilai->siswa->nama }}</td>
                         <td>{{ $nilai->siswa->kelas->nama }}</td>
                         <td>{{ \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-Y') }}</td>
-                        <td>{{ $nilai->deskripsi ?? '-' }}</td>
+                        <td style="min-width: 200px;">
+                          @php
+                            $mapelNama = $nilai->mapel->nama_mapel ?? '?';
+                            $deskripsi = $nilai->deskripsi ?? '-';
+                            $showModal = strlen($deskripsi) > 5 || strlen($mapelNama) > 5;
+                          @endphp
+
+                          <div class="d-flex justify-content-between align-items-center w-100">
+                            <div class="text-truncate" style="max-width: 150px; overflow: hidden;">
+                              <strong class="text-muted">[{{ Str::limit($mapelNama, 5) }}]</strong>
+                              {{ Str::limit($deskripsi, 5) }}
+                            </div>
+
+                            @if($showModal)
+                              <button type="button" class="btn btn-link p-0 ml-2" 
+                                      onclick="$('#modalDeskripsi{{ $nilai->id }}').modal('show')" 
+                                      title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                              </button>
+                            @endif
+                          </div>
+                        </td>
                         <td>{{ $nilai->nilai }}</td>
                         <td>
                           <div class="d-flex align-items-center">
@@ -98,81 +119,6 @@
                           </div>
                         </td>
                       </tr>
-
-                      <!-- Modal Edit -->
-                      <div class="modal fade" id="editModal{{ $nilai->id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ $nilai->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                          <div class="modal-content shadow-lg">
-                            <form action="{{ route('guru.penilaian.update', $nilai->id) }}" method="POST">
-                              @csrf
-                              @method('PUT')
-
-                              <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title font-weight-bold" id="editModalLabel{{ $nilai->id }}">
-                                  <i class="fas fa-pen mr-2"></i>Edit Nilai Siswa
-                                </h5>
-                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
-                              </div>
-
-                              <div class="modal-body">
-                                <div class="row">
-                                  <!-- Nama Siswa -->
-                                  <div class="form-group col-md-6">
-                                    <label class="font-weight-bold">Nama Siswa</label>
-                                    <input type="text" class="form-control" value="{{ $nilai->siswa->nama }}" readonly>
-                                  </div>
-
-                                  <!-- Kelas -->
-                                  <div class="form-group col-md-6">
-                                    <label class="font-weight-bold">Kelas</label>
-                                    <select name="kelas_id" class="form-control" disabled>
-                                      @foreach($kelases as $kelas)
-                                        <option value="{{ $kelas->id }}" {{ $nilai->siswa->kelas_id == $kelas->id ? 'selected' : '' }}>
-                                          {{ $kelas->nama }}
-                                        </option>
-                                      @endforeach
-                                    </select>
-                                  </div>
-                                </div>
-
-                                <div class="row">
-                                  <!-- Tanggal -->
-                                  <div class="form-group col-md-6">
-                                    <label class="font-weight-bold">Tanggal</label>
-                                    <input type="date" name="tanggal" class="form-control" 
-                                      value="{{ \Carbon\Carbon::parse($nilai->tanggal)->format('Y-m-d') }}" required>
-                                  </div>
-
-                                  <!-- Deskripsi -->
-                                  <div class="form-group col-md-6">
-                                    <label class="font-weight-bold">Deskripsi Tugas</label>
-                                    <input type="text" name="deskripsi_tugas" class="form-control" value="{{ $nilai->deskripsi }}" required>
-                                  </div>
-                                </div>
-
-                                <div class="row">
-                                  <!-- Nilai -->
-                                  <div class="form-group col-md-6">
-                                    <label class="font-weight-bold">Nilai</label>
-                                    <input type="number" name="nilai" class="form-control" value="{{ $nilai->nilai }}" min="0" max="100" required>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div class="modal-footer bg-light">
-                                <button type="submit" class="btn btn-primary">
-                                  <i class="fas fa-save mr-1"></i> Simpan
-                                </button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                  <i class="fas fa-times mr-1"></i> Batal
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
                       @endforeach
                   </tbody>
                 </table>
@@ -180,7 +126,7 @@
               </div>
             </div>
 
-            <!-- Modal -->
+            <!-- Modal Tambah -->
             <div class="modal fade" id="tambahNilaiModal" tabindex="-1" role="dialog" aria-labelledby="tambahNilaiModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <form action="{{ route('guru.penilaian.store') }}" method="POST" enctype="multipart/form-data">
@@ -254,6 +200,132 @@
             </div> 
             <!-- Input Modal End -->
 
+            <!-- Modal Deskripsi (dikeluarin dari table) -->
+            @foreach($nilaiHarian as $nilai)
+            @php
+              $mapelNama = $nilai->mapel->nama_mapel ?? '?';
+              $deskripsi = $nilai->deskripsi ?? '-';
+              $showModal = strlen($deskripsi) > 5 || strlen($mapelNama) > 5;
+            @endphp
+
+            @if($showModal)
+              <div class="modal fade" id="modalDeskripsi{{ $nilai->id }}" tabindex="-1" role="dialog" aria-labelledby="deskripsiLabel{{ $nilai->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                  <div class="modal-content border-info shadow rounded-lg">
+
+                    {{-- Header --}}
+                    <div class="modal-header bg-info text-white rounded-top">
+                      <h5 class="modal-title font-weight-bold" id="deskripsiLabel{{ $nilai->id }}">
+                        <i class="fas fa-book-open mr-2"></i> Detail Nilai Harian
+                      </h5>
+                      <button type="button" class="close text-white" data-dismiss="modal" aria-label="Tutup">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+
+                    {{-- Body --}}
+                    <div class="modal-body">
+                      <div class="card card-outline card-info mb-0">
+                        <div class="card-body pb-2">
+
+                          <div class="mb-3">
+                            <small class="text-muted d-block mb-1">
+                              <i class="fas fa-chalkboard-teacher mr-1"></i> Mata Pelajaran
+                            </small>
+                            <p class="mb-0 font-weight-semibold text-dark text-left">
+                              {{ $mapelNama }}
+                            </p>
+                          </div>
+
+                          <div>
+                            <small class="text-muted d-block mb-1">
+                              <i class="fas fa-align-left mr-1"></i> Deskripsi
+                            </small>
+                            <p class="mb-0 font-weight-semibold text-dark text-left">
+                              {{ $deskripsi }}
+                            </p>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+
+                    {{-- Divider --}}
+                    <hr class="my-0">
+
+                    {{-- Footer --}}
+                    <div class="modal-footer justify-content-end px-4 py-3">
+                      <button type="button" class="btn btn-outline-info" data-dismiss="modal">
+                        <i class="fas fa-times-circle mr-1"></i> Tutup
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            @endif
+          @endforeach
+
+            <!-- Modal Edit (juga dipindah ke luar table) -->
+            @foreach($nilaiHarian as $nilai)
+              <div class="modal fade" id="editModal{{ $nilai->id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ $nilai->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                  <div class="modal-content shadow-lg">
+                    <form action="{{ route('guru.penilaian.update', $nilai->id) }}" method="POST">
+                      @csrf
+                      @method('PUT')
+                      <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title font-weight-bold" id="editModalLabel{{ $nilai->id }}">
+                          <i class="fas fa-pen mr-2"></i>Edit Nilai Siswa
+                        </h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Nama Siswa</label>
+                            <input type="text" class="form-control" value="{{ $nilai->siswa->nama }}" readonly>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Kelas</label>
+                            <select name="kelas_id" class="form-control" disabled>
+                              @foreach($kelases as $kelas)
+                                <option value="{{ $kelas->id }}" {{ $nilai->siswa->kelas_id == $kelas->id ? 'selected' : '' }}>
+                                  {{ $kelas->nama }}
+                                </option>
+                              @endforeach
+                            </select>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Tanggal</label>
+                            <input type="date" name="tanggal" class="form-control" value="{{ \Carbon\Carbon::parse($nilai->tanggal)->format('Y-m-d') }}" required>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Deskripsi Tugas</label>
+                            <input type="text" name="deskripsi_tugas" class="form-control" value="{{ $nilai->deskripsi }}" required>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label class="font-weight-bold">Nilai</label>
+                            <input type="number" name="nilai" class="form-control" value="{{ $nilai->nilai }}" min="0" max="100" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer bg-light">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times mr-1"></i> Batal</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            @endforeach
+
             <!-- MODAL: Rekap Nilai -->
             <div class="modal fade" id="rekapModal" tabindex="-1" role="dialog" aria-labelledby="rekapModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-sm" role="document">
@@ -303,6 +375,34 @@
               </div>
             </div>
 
+            <!-- Modal Alert -->
+            <div class="modal fade" id="rekapKosongModal" tabindex="-1" role="dialog" aria-labelledby="rekapKosongLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header bg-warning">
+                    <h5 class="modal-title text-white" id="rekapKosongLabel">
+                      <i class="fas fa-exclamation-triangle mr-2"></i>Data Tidak Ditemukan
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="callout callout-warning mb-0">
+                      <h6><i class="fas fa-info-circle mr-1"></i> Informasi:</h6>
+                      <p>Tidak ditemukan data nilai untuk kelas <strong>{{ session('kelas_nama') }}</strong> dan mapel <strong>{{ session('mapel_nama') }}</strong>.</p>
+                      <p class="mb-0">Pastikan kamu memilih kelas dan mapel yang sesuai dengan data yang sudah diinput sebelumnya.</p>
+                    </div>
+                  </div>
+                  <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">
+                      <i class="fas fa-times-circle mr-1"></i> Tutup
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -311,4 +411,14 @@
     </div>
   </section>
 </div>
+@endsection
+
+@section('scripts')
+    @if (session('rekap_kosong'))
+    <script>
+        $(function () {
+            $('#rekapKosongModal').modal('show');
+        });
+    </script>
+    @endif
 @endsection

@@ -55,4 +55,40 @@ class GuruAkunController extends Controller
     return redirect()->route('admin.datamaster.users')->with('success', 'Akun guru berhasil dibuat');
 }
 
+public function update(Request $request, $id)
+{
+    // Gabung prefix + domain
+    if ($request->has('email_prefix')) {
+        $request->merge([
+            'email' => $request->email_prefix . '@sipena.com',
+        ]);
+    }
+
+    $request->validate([
+        'email' => 'required|email|ends_with:@sipena.com',
+        'role'  => 'required|in:guru,kepsek',
+        'password' => 'nullable|min:6',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->email = $request->email;
+    $user->role  = $request->role;
+
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
+
+    return redirect()->route('admin.datamaster.users')->with('success', 'Akun berhasil diperbarui');
+}
+
+public function destroy($id)
+{
+    $user = User::findOrFail($id);
+    $user->delete();
+
+    return redirect()->route('admin.datamaster.users')->with('success', 'Akun berhasil dihapus');
+}
+
 }

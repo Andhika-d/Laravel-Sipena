@@ -28,8 +28,8 @@ class AbsensiGuruController extends Controller
         ->first();
     
     $lokasiKantor = [
-        'lat' => -6.0758171,
-        'lng' => 106.0935026 
+        'latitude' => -6.0758171,
+        'longitude' => 106.0935026 
     ];
 
     return view('guru.absensi.index', compact(

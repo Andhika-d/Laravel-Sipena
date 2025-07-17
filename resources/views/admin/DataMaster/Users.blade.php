@@ -133,13 +133,60 @@
                       <td>{{ $user->created_at->format('d M Y') }}</td>
                       <td class="align-middle">
                         <div class="d-flex justify-content-center gap-1 flex-wrap">
-                          <a href="#" class="btn btn-sm btn-warning">
+                          <!-- Tombol Edit -->
+                          <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditAkun{{ $user->id }}">
                             <i class="bi bi-pencil-square"></i>
-                          </a>
-                          <a href="#" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i>
-                          </a>
+                          </button>
+                          <form action="{{ route('admin.guru-akun.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus akun ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </form>
                         </div>
+                        <!-- Modal Edit (dimasukkan ke dalam foreach) -->
+                            <div class="modal fade" id="modalEditAkun{{ $user->id }}" tabindex="-1">
+                              <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                  <form action="{{ route('admin.guru-akun.update', $user->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-header">
+                                      <h5 class="modal-title">Edit Akun</h5>
+                                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <!-- Email -->
+                                      <div class="form-floating mb-3 position-relative">
+                                        <input type="text" class="form-control pe-5" name="email_prefix" value="{{ explode('@', $user->email)[0] }}" required>
+                                        <label>Email (tanpa @sipena.com)</label>
+                                        <span class="position-absolute top-50 end-0 translate-middle-y text-muted me-3">@sipena.com</span>
+                                      </div>
+
+                                      <!-- Password -->
+                                      <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" name="password" placeholder="Kosongkan jika tidak diubah">
+                                        <label>Password Baru (opsional)</label>
+                                      </div>
+
+                                      <!-- Role -->
+                                      <div class="form-floating mb-3">
+                                        <select class="form-select" name="role" required>
+                                          <option value="guru" {{ $user->role == 'guru' ? 'selected' : '' }}>Guru</option>
+                                          <option value="kepsek" {{ $user->role == 'kepsek' ? 'selected' : '' }}>Kepala Sekolah</option>
+                                        </select>
+                                        <label>Role</label>
+                                      </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                      <button type="submit" class="btn btn-primary">Simpan</button>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
                       </td>
                     </tr>
                     @endforeach

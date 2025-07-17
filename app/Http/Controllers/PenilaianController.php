@@ -102,6 +102,15 @@ class PenilaianController extends Controller
                     ->orderBy('tanggal', 'asc')
                     ->get();
 
+        // Cek jika data kosong
+        if ($data->isEmpty()) {
+            return redirect()->back()->with([
+                'rekap_kosong' => true,
+                'kelas_nama' => $kelas->nama,
+                'mapel_nama' => $mapel->nama_mapel
+            ]);
+        }
+
         $filename = 'rekap_nilai_' . strtolower(str_replace(' ', '_', $kelas->nama)) . '_' . strtolower(str_replace(' ', '_', $mapel->nama_mapel)) . '.csv';
 
         $headers = [
