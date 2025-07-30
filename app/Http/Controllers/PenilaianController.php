@@ -14,27 +14,35 @@ use App\Exports\RekapNilaiExport;
 class PenilaianController extends Controller
 {
     // TAMPILAN UTAMA PENILAIAN
-    public function index()
-    {
-        $siswa = Siswa::with('kelas')->get();
-        $mapels = Mapel::all();
-        $kelases = Kelas::all();
-        $kkm = 75;
+    public function index(Request $request)
+{
+    $siswa = Siswa::with('kelas')->get();
+    $mapels = Mapel::all();
+    $kelases = Kelas::all();
+    $kkm = 75;
 
-        $nilaiHarian = NilaiHarian::with(['siswa.kelas', 'mapel'])
-            ->where('guru_id', Auth::user()->guru->id)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+    $query = NilaiHarian::with(['siswa.kelas', 'mapel'])
+        ->where('guru_id', Auth::user()->guru->id);
 
-        $rataRataNilai = $nilaiHarian->avg('nilai') ?? 0;
-        $jumlahLulus = $nilaiHarian->where('nilai', '>=', $kkm)->count();
-        $jumlahTidakLulus = $nilaiHarian->where('nilai', '<', $kkm)->count();
+    // Ambil semua data (tanpa paginasi) untuk statistik
+    $allData = (clone $query)->get();
 
-        return view('guru.penilaian.index', compact(
-            'siswa', 'mapels', 'nilaiHarian', 'kelases',
-            'kkm', 'rataRataNilai', 'jumlahLulus', 'jumlahTidakLulus'
-        ));
+    if ($request->filled('siswa_id')) {
+        $query->where('siswa_id', $request->siswa_id);
     }
+
+    $nilaiHarian = $query->orderBy('tanggal', 'desc')->paginate(3)->withQueryString();
+
+    // Statistik akurat dari semua data
+    $rataRataNilai = $allData->avg('nilai') ?? 0;
+    $jumlahLulus = $allData->where('nilai', '>=', $kkm)->count();
+    $jumlahTidakLulus = $allData->where('nilai', '<', $kkm)->count();
+
+    return view('guru.penilaian.index', compact(
+        'siswa', 'mapels', 'nilaiHarian', 'kelases',
+        'kkm', 'rataRataNilai', 'jumlahLulus', 'jumlahTidakLulus','allData'
+    ));
+}   
 
     // SIMPAN NILAI HARIAN
     public function store(Request $request)

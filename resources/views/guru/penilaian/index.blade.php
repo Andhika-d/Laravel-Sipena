@@ -33,17 +33,19 @@
               <div class="card-header d-flex justify-content-between align-items-center">
 
                 <div class="d-flex align-items-center ml-auto">
-                  <!-- Search box -->
-                  <div style="width: 170px;">
-                    <div class="input-group input-group-sm">
-                      <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                      <div class="input-group-append">
-                        <button type="submit" class="btn btn-default">
-                          <i class="fas fa-search"></i>
-                        </button>
-                      </div>
+                  <!-- Dropdown Filter Nama -->
+                  <form method="GET" action="{{ route('guru.penilaian') }}">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                      <select name="siswa_id" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- Pilih Semua Siswa --</option>
+                        @foreach($siswa as $s)
+                          <option value="{{ $s->id }}" {{ request('siswa_id') == $s->id ? 'selected' : '' }}>
+                            {{ $s->nama }}
+                          </option>
+                        @endforeach
+                      </select>
                     </div>
-                  </div>
+                  </form>
 
                   <!-- Spacer -->
                   <div style="width: 10px;"></div>
@@ -119,7 +121,7 @@
                   <tbody>
                     @foreach($nilaiHarian as $index => $nilai)
                       <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $nilaiHarian->firstItem() + $index }}</td>
                         <td>{{ $nilai->siswa->nama }}</td>
                         <td>{{ $nilai->siswa->kelas->nama }}</td>
                         <td>{{ \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-Y') }}</td>
@@ -164,6 +166,13 @@
                       @endforeach
                   </tbody>
                 </table>
+                <div class="row mt-3">
+                  <div class="col-12 d-flex justify-content-center justify-content-md-end">
+                    <div class="d-flex justify-content-center justify-content-md-end mt-3 px-2">
+                      {{ $nilaiHarian->links() }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -452,6 +461,24 @@
     </div>
   </section>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropdown = document.getElementById('filterByNama');
+
+    dropdown.addEventListener('change', function () {
+      const selectedNama = this.value.toLowerCase();
+
+      document.querySelectorAll('table tbody tr').forEach(function (row) {
+        const namaCell = row.querySelectorAll('td')[1]; // kolom ke-2: Nama Siswa
+        if (!selectedNama || namaCell.textContent.toLowerCase() === selectedNama) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
 @endsection
 
 @section('scripts')

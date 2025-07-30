@@ -122,6 +122,7 @@
             }
 
   </style>
+  @stack('styles')
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
@@ -225,5 +226,6 @@
     });
    </script>
     @yield('scripts')
+   @stack('scripts')
 </body>
 </html>
