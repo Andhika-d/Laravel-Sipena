@@ -34,4 +34,15 @@ class AbsensiGuru extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function guru()
+    {
+        return $this->hasOneThrough(
+            \App\Models\Guru::class,
+            \App\Models\User::class,
+            'id',        // users.id
+            'id',        // gurus.id
+            'user_id',   // absensi_guru.user_id
+            'guru_id'    // users.guru_id
+        );
+    }
 }

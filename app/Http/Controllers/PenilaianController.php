@@ -8,6 +8,8 @@ use App\Models\Siswa;
 use App\Models\Mapel;
 use App\Models\Kelas;
 use App\Models\NilaiHarian;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\RekapNilaiExport;
 
 class PenilaianController extends Controller
 {
@@ -17,12 +19,21 @@ class PenilaianController extends Controller
         $siswa = Siswa::with('kelas')->get();
         $mapels = Mapel::all();
         $kelases = Kelas::all();
+        $kkm = 75;
+
         $nilaiHarian = NilaiHarian::with(['siswa.kelas', 'mapel'])
             ->where('guru_id', Auth::user()->guru->id)
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('guru.penilaian.index', compact('siswa', 'mapels', 'nilaiHarian', 'kelases'));
+        $rataRataNilai = $nilaiHarian->avg('nilai') ?? 0;
+        $jumlahLulus = $nilaiHarian->where('nilai', '>=', $kkm)->count();
+        $jumlahTidakLulus = $nilaiHarian->where('nilai', '<', $kkm)->count();
+
+        return view('guru.penilaian.index', compact(
+            'siswa', 'mapels', 'nilaiHarian', 'kelases',
+            'kkm', 'rataRataNilai', 'jumlahLulus', 'jumlahTidakLulus'
+        ));
     }
 
     // SIMPAN NILAI HARIAN
@@ -37,12 +48,12 @@ class PenilaianController extends Controller
         ]);
 
         NilaiHarian::create([
-            'siswa_id' => $request->siswa_id,
-            'mapel_id' => $request->mapel_id,
+            'siswa_id' => $request->input('siswa_id'),
+            'mapel_id' => $request->input('mapel_id'),
             'guru_id' => Auth::user()->guru->id,
-            'tanggal' => $request->tanggal,
-            'deskripsi' => $request->deskripsi,
-            'nilai' => $request->nilai,
+            'tanggal' => $request->input('tanggal'),
+            'deskripsi' => $request->input('deskripsi'),
+            'nilai' => $request->input('nilai'),
         ]);
 
         return back()->with('success', 'Nilai berhasil disimpan.');
@@ -67,10 +78,11 @@ class PenilaianController extends Controller
         ]);
 
         $nilai = NilaiHarian::findOrFail($id);
+
         $nilai->update([
-            'deskripsi' => $request->deskripsi_tugas,
-            'nilai' => $request->nilai,
-            'tanggal' => $request->tanggal,
+            'deskripsi' => $request->input('deskripsi_tugas'),
+            'nilai' => $request->input('nilai'),
+            'tanggal' => $request->input('tanggal'),
         ]);
 
         return redirect()->route('guru.penilaian')->with('success', 'Data nilai berhasil diperbarui.');
@@ -94,50 +106,33 @@ class PenilaianController extends Controller
         $kelas = Kelas::findOrFail($request->kelas_id);
         $mapel = Mapel::findOrFail($request->mapel_id);
 
-        $data = NilaiHarian::whereHas('siswa', function ($query) use ($kelas) {
-                        $query->where('kelas_id', $kelas->id);
+        $data = NilaiHarian::whereHas('siswa', function ($q) use ($kelas) {
+                        $q->where('kelas_id', $kelas->id);
                     })
                     ->where('mapel_id', $mapel->id)
                     ->with(['siswa.kelas', 'mapel'])
-                    ->orderBy('tanggal', 'asc')
                     ->get();
 
-        // Cek jika data kosong
         if ($data->isEmpty()) {
             return redirect()->back()->with([
                 'rekap_kosong' => true,
                 'kelas_nama' => $kelas->nama,
-                'mapel_nama' => $mapel->nama_mapel
+                'mapel_nama' => $mapel->nama_mapel,
             ]);
         }
 
-        $filename = 'rekap_nilai_' . strtolower(str_replace(' ', '_', $kelas->nama)) . '_' . strtolower(str_replace(' ', '_', $mapel->nama_mapel)) . '.csv';
+        $rataRataPerSiswa = $data->groupBy('siswa_id')->map(function ($item) {
+            return [
+                'nama' => $item->first()->siswa->nama,
+                'kelas' => $item->first()->siswa->kelas->nama,
+                'mapel' => $item->first()->mapel->nama_mapel,
+                'rata_rata' => $item->avg('nilai'),
+            ];
+        });
 
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ];
+        $filename = 'Rekap Nilai ' . $kelas->nama . ' - ' . $mapel->nama_mapel . '.xlsx';
 
-        $callback = function () use ($data) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['No', 'Nama Siswa', 'Kelas', 'Mapel', 'Tanggal', 'Deskripsi', 'Nilai']);
-
-            foreach ($data as $i => $nilai) {
-                fputcsv($handle, [
-                    $i + 1,
-                    $nilai->siswa->nama,
-                    $nilai->siswa->kelas->nama,
-                    $nilai->mapel->nama_mapel,
-                    \Carbon\Carbon::parse($nilai->tanggal)->format('d-m-Y'),
-                    $nilai->deskripsi ?? '-',
-                    $nilai->nilai
-                ]);
-            }
-
-            fclose($handle);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new RekapNilaiExport($data, $rataRataPerSiswa), $filename);
     }
 
 }

@@ -60,8 +60,50 @@
 
                 </div>
               </div>
-              <div class="card-body table-responsive p-0">
+              {{-- Statistik --}}
+              <div class="card-body pt-3 pb-2">
+                <div class="row g-2">
+                  {{-- Rata-rata --}}
+                  <div class="col-md-4">
+                    <div class="card shadow-sm mb-0">
+                      <div class="card-body py-2 px-3 d-flex align-items-center">
+                        <i class="fas fa-chart-line text-primary mr-2" style="font-size: 16px;"></i>
+                        <div>
+                          <div class="text-muted" style="font-size: 11px;">Rata-rata</div>
+                          <div class="font-weight-bold" style="font-size: 13px;">{{ number_format($rataRataNilai, 2) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
+                  {{-- Lulus --}}
+                  <div class="col-md-4">
+                    <div class="card shadow-sm mb-0">
+                      <div class="card-body py-2 px-3 d-flex align-items-center">
+                        <i class="fas fa-check-circle text-success mr-2" style="font-size: 16px;"></i>
+                        <div>
+                          <div class="text-muted" style="font-size: 11px;">Lulus (≥ {{ $kkm }})</div>
+                          <div class="font-weight-bold" style="font-size: 13px;">{{ $jumlahLulus }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {{-- Tidak Lulus --}}
+                  <div class="col-md-4">
+                    <div class="card shadow-sm mb-0">
+                      <div class="card-body py-2 px-3 d-flex align-items-center">
+                        <i class="fas fa-times-circle text-danger mr-2" style="font-size: 16px;"></i>
+                        <div>
+                          <div class="text-muted" style="font-size: 11px;">Tidak Lulus (&lt; {{ $kkm }})</div>
+                          <div class="font-weight-bold" style="font-size: 13px;">{{ $jumlahTidakLulus }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body table-responsive p-0">
                 <table class="table table-hover text-nowrap">
                   <thead>
                     <tr>
@@ -122,7 +164,6 @@
                       @endforeach
                   </tbody>
                 </table>
-
               </div>
             </div>
 

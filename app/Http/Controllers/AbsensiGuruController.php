@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\AbsensiGuru;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+/**
+ * @param \Illuminate\Http\Request $request
+ * @return \Illuminate\Http\RedirectResponse
+ *
+ * @property string $status_kehadiran
+ * @property string|null $deskripsi
+ * @property \Illuminate\Http\UploadedFile|null $file_pendukung
+ */
 
 class AbsensiGuruController extends Controller
 {
@@ -28,8 +36,8 @@ class AbsensiGuruController extends Controller
         ->first();
     
     $lokasiKantor = [
-        'latitude' => -6.0758171,
-        'longitude' => 106.0935026 
+        'latitude' => -6.077886,
+        'longitude' => 106.120837 
     ];
 
     return view('guru.absensi.index', compact(

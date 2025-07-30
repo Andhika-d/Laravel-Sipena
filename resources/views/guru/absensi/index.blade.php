@@ -460,7 +460,9 @@
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
           const accuracy = position.coords.accuracy;
-
+          
+          console.log("Latitude:", userLat);
+          console.log("Longitude:", userLng);
           console.log("Akurasi lokasi:", accuracy + " meter");
 
           document.getElementById("latitude").value = userLat;

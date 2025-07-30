@@ -2,7 +2,8 @@
     <thead>
         <tr>
             <th>Nama Guru</th>
-            <th>Hadir</th>
+            <th>Hadir Lengkap</th>
+            <th>Belum Lengkap</th>
             <th>Izin</th>
             <th>Sakit</th>
             <th>Alfa</th>
@@ -14,12 +15,13 @@
         @foreach($rekap as $item)
             <tr>
                 <td>{{ $item['nama_guru'] }}</td>
-                <td>{{ $item['hadir'] }}</td>
+                <td>{{ $item['hadir_lengkap'] }}</td>
+                <td>{{ $item['hadir_belum_lengkap'] }}</td>
                 <td>{{ $item['izin'] }}</td>
                 <td>{{ $item['sakit'] }}</td>
                 <td>{{ $item['alfa'] }}</td>
                 <td>{{ $item['total'] }}</td>
-                <td>{{ $item['persentase'] }}%</td>
+                <td>{{ number_format($item['persentase'], 2) }}%</td>
             </tr>
         @endforeach
     </tbody>

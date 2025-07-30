@@ -76,16 +76,78 @@
 
   <!-- Modal Info -->
   <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px; width: 90%;">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="infoModalLabel">Ringkasan Data Sekolah</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body">
+
+          {{-- Histori Absen & Nilai --}}
+          <div class="row g-2 mb-2">
+            {{-- Histori Absen --}}
+            <div class="col-6 d-flex flex-column">
+              <div class="card h-100">
+                <div class="card-body p-2">
+                  <h6 class="text-muted mb-2 d-flex justify-content-between align-items-center">
+                    Absen Terakhir
+                    <a href="#" class="ms-2 text-secondary" onclick="openAbsenHistori()">
+                      <i class="bi bi-clock-history"></i>
+                    </a>
+                  </h6>
+                  <ul class="list-group small">
+                    @forelse ($historiAbsensi as $absen)
+                      <li class="list-group-item py-2 px-2 d-flex align-items-start gap-2">
+                        <i class="bi bi-calendar-check-fill text-success fs-5 mt-1"></i>
+                        <div>
+                          <span class="fw-medium">{{ $absen->guru->nama ?? 'Guru telah dihapus' }}</span><br>
+                          <small class="text-muted">{{ \Carbon\Carbon::parse($absen->tanggal)->translatedFormat('d F Y') }}</small>
+                        </div>
+                      </li>
+                    @empty
+                      <li class="list-group-item text-muted">Belum ada data absen.</li>
+                    @endforelse
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {{-- Histori Nilai --}}
+            <div class="col-6 d-flex flex-column">
+              <div class="card h-100">
+                <div class="card-body p-2">
+                  <h6 class="text-muted mb-2 d-flex justify-content-between align-items-center">
+                    Penilaian Terakhir
+                    <a href="#" class="ms-2 text-secondary" onclick="openNilaiHistori()">
+                      <i class="bi bi-clock-history"></i>
+                    </a>
+                  </h6>
+                  <ul class="list-group small">
+                    @forelse ($historiNilai as $nilai)
+                      <li class="list-group-item py-2 px-2 d-flex align-items-start gap-2">
+                        <i class="bi bi-pencil-square text-info fs-5 mt-1"></i>
+                        <div>
+                          <span class="fw-medium">{{ $nilai->siswa->nama ?? 'Siswa dihapus' }}</span><br>
+                          <small class="text-muted">
+                            {{ \Carbon\Carbon::parse($nilai->tanggal)->translatedFormat('d F Y') }}<br>
+                            Guru: {{ $nilai->guru->nama ?? 'Guru dihapus' }}
+                          </small>
+                        </div>
+                      </li>
+                    @empty
+                      <li class="list-group-item text-muted">Belum ada data penilaian.</li>
+                    @endforelse
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Info Kartu Statistik --}}
           <div class="row g-2">
             <!-- Total Siswa -->
-            <div class="col-6 col-md-6">
+            <div class="col-6">
               <div class="card info-card mb-1">
                 <div class="card-body p-3">
                   <div class="d-flex align-items-center">
@@ -102,7 +164,7 @@
             </div>
 
             <!-- Total Guru -->
-            <div class="col-6 col-md-6">
+            <div class="col-6">
               <div class="card info-card mb-1">
                 <div class="card-body p-3">
                   <div class="d-flex align-items-center">
@@ -119,7 +181,7 @@
             </div>
 
             <!-- Total Kelas -->
-            <div class="col-6 col-md-6">
+            <div class="col-6">
               <div class="card info-card mb-1">
                 <div class="card-body p-3">
                   <div class="d-flex align-items-center">
@@ -136,7 +198,7 @@
             </div>
 
             <!-- Total Mapel -->
-            <div class="col-6 col-md-6">
+            <div class="col-6">
               <div class="card info-card mb-1">
                 <div class="card-body p-3">
                   <div class="d-flex align-items-center">
@@ -160,6 +222,73 @@
       </div>
     </div>
   </div>
+
+  
+  <!-- Modal Histori Absen Lengkap -->
+  <div class="modal fade" id="modalHistoriAbsenLengkap" tabindex="-1" aria-labelledby="modalHistoriAbsenLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalHistoriAbsenLabel">Histori Absensi Guru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <ul class="list-group mb-3">
+            @forelse ($semuaHistoriAbsensi as $absen)
+              <li class="list-group-item py-2 px-2 d-flex align-items-start gap-2">
+                <i class="bi bi-calendar-check-fill text-success" style="font-size: 1.1rem; margin-top: 2px;"></i>
+                <div>
+                  <span class="fw-medium">{{ $absen->guru->nama ?? 'Guru telah dihapus' }}</span><br>
+                  <small class="text-muted">{{ \Carbon\Carbon::parse($absen->tanggal)->translatedFormat('d F Y') }}</small>
+                </div>
+              </li>
+            @empty
+              <li class="list-group-item text-muted">Belum ada histori absen.</li>
+            @endforelse
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Histori Penilaian Lengkap -->
+  <div class="modal fade" id="modalHistoriNilaiLengkap" tabindex="-1" aria-labelledby="modalHistoriNilaiLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 700px;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalHistoriNilaiLabel">Histori Penilaian Siswa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <ul class="list-group mb-3">
+            @forelse ($semuaHistoriNilai as $nilai)
+              <li class="list-group-item py-2 px-2 d-flex align-items-start gap-2">
+                <i class="bi bi-pencil-fill text-info" style="font-size: 1.1rem; margin-top: 2px;"></i>
+                <div>
+                  <span class="fw-medium">{{ $nilai->siswa->nama ?? 'Siswa dihapus' }}</span><br>
+                  <small class="text-muted">
+                    {{ \Carbon\Carbon::parse($nilai->tanggal)->translatedFormat('d F Y') }}<br>
+                    Guru: {{ $nilai->guru->nama ?? 'Guru dihapus' }}
+                  </small>
+                </div>
+              </li>
+            @empty
+              <li class="list-group-item text-muted">Belum ada histori penilaian.</li>
+            @endforelse
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </main>
   <!-- End #main -->
     
@@ -179,6 +308,32 @@
 
   <!-- Template Main JS File -->
   <script src="{{ asset('assets/js/main.js') }}"></script>
+
+  <script>
+    function openNilaiHistori() {
+      const infoModal = bootstrap.Modal.getInstance(document.getElementById('infoModal'));
+      const nilaiModal = new bootstrap.Modal(document.getElementById('modalHistoriNilaiLengkap'));
+      
+      infoModal.hide();
+      nilaiModal.show();
+
+      document.getElementById('modalHistoriNilaiLengkap').addEventListener('hidden.bs.modal', function () {
+        infoModal.show();
+      }, { once: true });
+    }
+
+    function openAbsenHistori() {
+      const infoModal = bootstrap.Modal.getInstance(document.getElementById('infoModal'));
+      const absenModal = new bootstrap.Modal(document.getElementById('modalHistoriAbsenLengkap'));
+      
+      infoModal.hide();
+      absenModal.show();
+
+      document.getElementById('modalHistoriAbsenLengkap').addEventListener('hidden.bs.modal', function () {
+        infoModal.show();
+      }, { once: true });
+    }
+  </script>
 
 </body>
 
