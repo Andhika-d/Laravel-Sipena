@@ -53,11 +53,14 @@
         <div class="card">
             <div class="card-body">
               <h5 class="card-title">Tabel Data Guru</h5>
-              <div class="col-md-4">
-                <input type="text" id="searchGuru" class="form-control form-control-sm mb-3" placeholder="Cari Guru...">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div style="min-width: 250px;">
+                  <input type="text" id="searchGuru" class="form-control form-control-sm" placeholder="Cari Guru...">
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
+                  <i class="bi bi-plus-lg"></i> Guru
+                </button>
               </div>
-              <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
-              <i class="bi bi-plus-lg"></i> Guru</button>
 
               <!-- Modal Tambah Guru -->
               <div class="modal fade" id="modalTambahGuru" tabindex="-1">
@@ -81,10 +84,6 @@
                         <option value="P">Perempuan</option>
                       </select>
                       <label for="floatingJk">Jenis Kelamin</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingJurusan" name="jurusan" placeholder="Jurusan">
-                      <label for="floatingJurusan">Jurusan</label>
                     </div>
                     <div class="mb-3">
                       <label for="floatingMengajar" class="form-label">Mengajar</label>
@@ -114,15 +113,14 @@
               </div>
 
               <!-- Default Table -->
-               <div class="table-responsive">
+              <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
                   <tr>
                     <th scope="col">No</th>
                     <th scope="col">Nama</th>
-                    <th scope="col">Jk</th>
-                    <th scope="col">Jurusan</th>
-                    <th scope="col">Mengajar</th>
+                    <th scope="col">Jenis Kelamin</th>
+                    <th scope="col">Mata Pelajaran</th>
                     <th scope="col">Kelas</th>
                     <th scope="col">Aksi</th>
                   </tr>
@@ -135,7 +133,6 @@
                   <td class="align-middle">
                     {{ $guru->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
                   </td>
-                  <td class="align-middle">{{ $guru->jurusan_prodi }}</td>
                   <td class="align-middle" style="max-width: 300px; white-space: normal;">
                     @foreach ($guru->mapel as $m)
                       <span class="badge bg-primary me-1 mb-1">{{ $m->nama_mapel }}</span>
@@ -185,11 +182,6 @@
                               <option value="P" {{ $guru->jenis_kelamin == 'P' ? 'selected' : '' }}>Perempuan</option>
                             </select>
                             <label>Jenis Kelamin</label>
-                          </div>
-
-                          <div class="form-floating mb-3">
-                            <input type="text" class="form-control" name="jurusan_prodi" value="{{ $guru->jurusan_prodi }}" placeholder="Jurusan">
-                            <label>Jurusan</label>
                           </div>
 
                           <div class="mb-3">

@@ -24,7 +24,6 @@ class GuruController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'jk' => 'required|in:L,P',
-            'jurusan' => 'required|string|max:255',
             'mapel' => 'required|array', // validasi baru
             'mapel.*' => 'exists:mapel,id', // pastikan id mapel valid
             'kelas_id' => 'required|exists:kelas,id',
@@ -33,7 +32,6 @@ class GuruController extends Controller
         $guru = Guru::create([
             'nama' => $request->nama,
             'jenis_kelamin' => $request->jk,
-            'jurusan_prodi' => $request->jurusan,
             'kelas_id' => $request->kelas_id,
         ]);
 
@@ -53,7 +51,6 @@ class GuruController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P',
-            'jurusan_prodi' => 'required|string|max:255',
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_ids' => 'required|array',
             'mapel_ids.*' => 'exists:mapel,id',
@@ -63,7 +60,6 @@ class GuruController extends Controller
         $guru->update([
             'nama' => $request->nama,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'jurusan_prodi' => $request->jurusan_prodi,
             'kelas_id' => $request->kelas_id,
         ]);
 

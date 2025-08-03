@@ -68,13 +68,15 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
   // Kelas CRUD
   Route::resource('kelas', KelasController::class)->names('admin.kelas');
-
+  Route::post('kelas/import', [KelasController::class, 'import'])->name('admin.kelas.import');
   // Siswa CRUD
   Route::resource('siswa', SiswaController::class)->names('admin.siswa');
+  Route::post('/siswa/import', [SiswaController::class, 'import'])->name('admin.siswa.import');
+
 
   // Mapel CRUD
   Route::resource('mapel', MapelController::class)->names('admin.mapel');
-
+  Route::post('mapel/import', [MapelController::class, 'import'])->name('admin.mapel.import');
 });
 
 Route::prefix('guru')->middleware('auth')->group(function () {

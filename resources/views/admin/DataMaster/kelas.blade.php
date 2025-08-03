@@ -42,19 +42,62 @@
   <section class="section">
     <div class="card">
       <div class="card-body pt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="card-title">Daftar Kelas</h5>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahKelas">
-            <i class="bi bi-plus-lg"></i> Tambah
-          </button>
+        <div class="d-flex align-items-center mb-3">
+          <h5 class="card-title mb-0">Daftar Kelas</h5>
+          <div class="d-flex gap-2 ms-auto">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalImportKelas">
+              <i class="bi bi-upload"></i> Upload Excel
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahKelas">
+              <i class="bi bi-plus-lg"></i> Tambah
+            </button>
+          </div>
         </div>
 
         @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {{ session('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        @endif
+          <!-- Modal Sukses -->
+          <div class="modal fade" id="modalSuccess" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content border-success">
+                <div class="modal-header bg-success text-white">
+                  <h5 class="modal-title">Berhasil</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <p>{{ session('success') }}</p>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-success" data-bs-dismiss="modal">Oke</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          @endif
+
+          @if(session('import_errors'))
+          <!-- Modal Error -->
+          <div class="modal fade" id="modalImportError" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+              <div class="modal-content border-warning">
+                <div class="modal-header bg-warning text-dark">
+                  <h5 class="modal-title">Beberapa Data Gagal Diimpor</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <p>Masalah berikut ditemukan:</p>
+                  <ul class="list-group">
+                    @foreach(session('import_errors') as $error)
+                      <li class="list-group-item list-group-item-warning">{{ $error }}</li>
+                    @endforeach
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-warning" data-bs-dismiss="modal">Tutup</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          @endif
 
         <table class="table table-bordered">
           <thead>
@@ -139,6 +182,34 @@
       </div>
     </div>
   </div>
+  <!-- Modal Import Kelas -->
+  <div class="modal fade" id="modalImportKelas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form action="{{ route('admin.kelas.import') }}" method="POST" enctype="multipart/form-data">
+          @csrf
+          <div class="modal-header">
+            <h5 class="modal-title">Upload Excel Kelas</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="file" class="form-label">Pilih file Excel (.xlsx)</label>
+              <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls" required>
+            </div>
+            <div class="alert alert-info">
+              Format kolom: <strong>nama_kelas</strong><br>
+              <small>Contoh isi file: <code>6A</code>, <code>6B</code></small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn btn-success">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   </main>
 
@@ -170,6 +241,25 @@
       });
     });
   </script>
+
+    @if(session('success') && !session('import_errors'))
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+      modal.show();
+    });
+  </script>
+  @endif
+
+  @if(session('import_errors'))
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var modal = new bootstrap.Modal(document.getElementById('modalImportError'));
+      modal.show();
+    });
+  </script>
+  @endif
+
 </body>
 </html>
 

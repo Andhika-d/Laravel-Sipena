@@ -56,9 +56,9 @@
   </li>
 
   <li class="nav-item">
-    <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#qrModal">
-      <i class="fas fa-qrcode"></i> QR Absen
-    </a>
+  <a href="#" class="nav-link collapsed" data-bs-toggle="modal" data-bs-target="#qrModal">
+    <i class="bi bi-qr-code"></i><span>QR Absen</span>
+  </a>
   </li>
 
   <li class="nav-item">
