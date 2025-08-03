@@ -3,6 +3,7 @@
 @section('title', 'Home')
 
 @section('content')
+
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <section class="content-header">
@@ -88,7 +89,7 @@
             </div>
           </div>
 
-          <!-- Absen Manual -->
+          <!-- Absensi -->
           <div class="card-body">
             <div class="row">
               <div class="col">
@@ -305,6 +306,208 @@
     </div>
   </div>
   </section>
+
+  @if(session('modal_error'))
+<style>
+  /* Biar modal pas di HP, gak terlalu lebar */
+  .custom-modal .modal-dialog {
+    max-width: 90%;
+    margin: auto;
+  }
+
+  .custom-modal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-modal .modal-header {
+    border-bottom: none;
+    justify-content: center;
+    background: #dc3545;
+    color: #fff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .custom-modal .modal-body {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .custom-modal .modal-body p {
+    margin-bottom: 0.75rem;
+  }
+</style>
+
+<div class="modal fade custom-modal" id="lokasiModal" tabindex="-1" aria-labelledby="lokasiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="lokasiModalLabel">
+          <i class="fas fa-exclamation-circle me-2"></i> Absen Gagal
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted">{{ session('error_message') }}</p>
+        @if(session('jarak'))
+          <p><strong>Jarak Anda:</strong><br> 
+            <span class="text-danger fs-5">
+              {{ number_format(session('jarak') * 1000, 0, ',', '.') }} meter
+            </span>
+          </p>
+        @endif
+        <small class="text-muted">Klik di luar untuk menutup</small>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = new bootstrap.Modal(document.getElementById('lokasiModal'));
+    modal.show();
+  });
+</script>
+@endif
+
+@if(session('modal_success'))
+<style>
+  .custom-modal .modal-dialog {
+    max-width: 90%;
+    margin: auto;
+  }
+
+  .custom-modal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-modal .modal-header {
+    border-bottom: none;
+    justify-content: center;
+    background: #28a745;
+    color: #fff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .custom-modal .modal-body {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .custom-modal .modal-body p {
+    margin-bottom: 0.75rem;
+  }
+</style>
+
+<div class="modal fade custom-modal" id="suksesModal" tabindex="-1" aria-labelledby="suksesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="suksesModalLabel">
+          <i class="fas fa-check-circle me-2"></i> Absen Berhasil
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted">{{ session('success_message') ?? 'Anda telah berhasil melakukan absen.' }}</p>
+
+        @if(session('jarak'))
+          <p><strong>Jarak Anda:</strong><br>
+            <span class="text-success fs-5">
+              {{ number_format(session('jarak') * 1000, 0, ',', '.') }} meter
+            </span>
+          </p>
+        @endif
+
+        <small class="text-muted">Klik di luar untuk menutup</small>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = new bootstrap.Modal(document.getElementById('suksesModal'));
+    modal.show();
+  });
+</script>
+@endif
+
+@if(session('modal_info'))
+<style>
+  .custom-modal .modal-dialog {
+    max-width: 90%;
+    margin: auto;
+  }
+
+  .custom-modal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .custom-modal .modal-header {
+    border-bottom: none;
+    justify-content: center;
+    background: #17a2b8;
+    color: #fff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .custom-modal .modal-body {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .custom-modal .modal-body p {
+    margin-bottom: 0.75rem;
+  }
+</style>
+
+<div class="modal fade custom-modal" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="infoModalLabel">
+          <i class="fas fa-info-circle me-2"></i> Informasi
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <p class="text-muted">
+          {{ session('info_message') ?? 'Anda sudah melakukan absen hari ini.' }}
+        </p>
+
+        @if(session('jarak'))
+        <p><strong>Jarak Anda:</strong><br>
+          <span class="text-info fs-5">
+            {{ number_format(session('jarak') * 1000, 0, ',', '.') }} meter
+          </span>
+        </p>
+        @endif
+
+        <small class="text-muted">Klik di luar untuk menutup</small>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+    modal.show();
+  });
+</script>
+@endif
 
   <!-- Modal Info -->
   <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel" aria-hidden="true">

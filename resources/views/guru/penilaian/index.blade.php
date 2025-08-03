@@ -250,7 +250,7 @@
             </div> 
             <!-- Input Modal End -->
 
-            <!-- Modal Deskripsi (dikeluarin dari table) -->
+            <!-- Modal Deskripsi -->
             @foreach($nilaiHarian as $nilai)
             @php
               $mapelNama = $nilai->mapel->nama_mapel ?? '?';
@@ -316,7 +316,7 @@
             @endif
           @endforeach
 
-            <!-- Modal Edit (juga dipindah ke luar table) -->
+            <!-- Modal Edit -->
             @foreach($nilaiHarian as $nilai)
               <div class="modal fade" id="editModal{{ $nilai->id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ $nilai->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">

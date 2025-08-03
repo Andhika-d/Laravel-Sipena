@@ -18,14 +18,26 @@ public function login(Request $request)
 
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
-        
-        if (auth()->user()->role === 'admin') {
+
+        if (session()->has('qr_absen_redirect')) {
+            $url = session()->pull('qr_absen_redirect');
+
+            // Cegah langsung nyasar ke /handle
+            if (str_contains($url, '/handle')) {
+                $url = str_replace('/handle', '/redirect', $url);
+            }
+
+            return redirect()->to($url);
+        }
+
+        // Redirect by role
+        if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
-        } elseif (auth()->user()->role === 'guru') {
+        } elseif ($user->role === 'guru') {
             return redirect()->route('guru.dashboard');
         } else {
             return redirect()->route('kepsek.dashboard');
-        }        
+        }
     }
 
     return back()->withErrors([
@@ -33,9 +45,13 @@ public function login(Request $request)
     ]);
 }
 
+
 public function logout()
 {
     Auth::logout();
     return redirect('/login');
 }
+
 }
+
+

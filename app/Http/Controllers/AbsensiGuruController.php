@@ -28,7 +28,7 @@ class AbsensiGuruController extends Controller
     $today = Carbon::today();
     $now = Carbon::now();
     $jamMasukMulai = Carbon::createFromTime(6, 0);
-    $jamMasukSelesai = Carbon::createFromTime(8, 0);
+    $jamMasukSelesai = Carbon::createFromTime(7, 30);
     $jamPulang = Carbon::createFromTime(14, 0);
 
     $absenHariIni = AbsensiGuru::where('user_id', $user->id)
@@ -36,8 +36,8 @@ class AbsensiGuruController extends Controller
         ->first();
     
     $lokasiKantor = [
-        'latitude' => -6.077886,
-        'longitude' => 106.120837 
+        'latitude' => -6.075743,
+        'longitude' => 106.093441 
     ];
 
     return view('guru.absensi.index', compact(

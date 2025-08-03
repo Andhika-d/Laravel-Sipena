@@ -8,6 +8,7 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\GuruAkunController;
 use App\Http\Controllers\UserGuruController;
 use App\Http\Controllers\AbsensiGuruController;
+use App\Http\Controllers\QRAbsenController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\SiswaController;
@@ -23,6 +24,11 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+Route::get('/scan-qr', [QRAbsenController::class, 'handle'])->name('qr.scan');
+Route::get('/qr-absen', function () {
+    return view('guru.qr.absen-redirect');
+})->name('qr.absen.redirect');
+Route::get('/qr-image', [App\Http\Controllers\QRAbsenController::class, 'generateImage'])->name('qr.scan.image');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -44,6 +50,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
   Route::get('/', [AdminDashboardController::class, 'index'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard');
+
+   // QR Absen
+   Route::get('/qr-absen', [QRAbsenController::class, 'showStaticQR'])->name('admin.qr-absen');
 
   //CRUD data Guru
   Route::post('/guru', [GuruController::class, 'store'])->name('admin.guru.store');
@@ -75,6 +84,8 @@ Route::prefix('guru')->middleware('auth')->group(function () {
     Route::post('/absensi/masuk', [AbsensiGuruController::class, 'absenMasuk'])->name('guru.absen.masuk');
     Route::post('/absensi/pulang', [AbsensiGuruController::class, 'absenPulang'])->name('guru.absen.pulang');
     Route::post('/absensi/izin', [AbsensiGuruController::class, 'ajukanIzin'])->name('guru.absen.izin');
+    Route::get('/qr/absen/redirect', [QrAbsenController::class, 'redirect'])->name('qr.absen.redirect');
+    Route::post('/qr/absen/handle', [QrAbsenController::class, 'handle'])->name('qr.absen.handle');
 
     Route::get('/penilaian', [PenilaianController::class, 'index'])->name('guru.penilaian');
     Route::post('/penilaian/simpan', [PenilaianController::class, 'store'])->name('guru.penilaian.store');

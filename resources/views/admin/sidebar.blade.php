@@ -56,6 +56,12 @@
   </li>
 
   <li class="nav-item">
+    <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#qrModal">
+      <i class="fas fa-qrcode"></i> QR Absen
+    </a>
+  </li>
+
+  <li class="nav-item">
     <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
       <i class="bi bi-box-arrow-right"></i>
       <span>Logout</span>
