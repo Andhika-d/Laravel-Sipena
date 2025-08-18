@@ -41,9 +41,16 @@
         </a>
       </li>
       <div class="container">
-        <!-- Toggle Button -->
-        <button id="toggleButton" type="button" class="btn btn-primary btn-sm">
-            <span id="toggleStatus">Light</span>
+        <button
+          id="toggleButton"
+          type="button"
+          class="btn d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm"
+          style="font-size: 0.9rem;"
+        >
+          <span id="toggleIcon" class="position-relative d-inline-block" style="width: 1em; height: 1em;">
+            <i id="sunIcon" class="fas fa-sun text-secondary position-absolute transition-icon"></i>
+            <i id="moonIcon" class="fas fa-moon text-light position-absolute transition-icon"></i>
+          </span>
         </button>
       </div>
     </div>

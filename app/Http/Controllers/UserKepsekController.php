@@ -31,6 +31,14 @@ class UserKepsekController extends Controller
         $guruYangSudahAbsen = $absensiHariIni->pluck('user_id')->unique()->toArray();
         $guruBelumAbsen = array_diff($semuaGuru, $guruYangSudahAbsen);
         $jumlahBelumAbsen = count($guruBelumAbsen);
+        $listGuruHadir = \App\Models\AbsensiGuru::with('user.guru')
+        ->whereDate('tanggal', today())
+        ->where('status_kehadiran', 'hadir')
+        ->get()
+        ->pluck('user.guru.nama')
+        ->filter()
+        ->values()
+        ->toArray();
 
         return view('kepsek.dashboard', compact(
             'namakepsek',
@@ -39,7 +47,8 @@ class UserKepsekController extends Controller
             'jumlahIzin',
             'jumlahSakit',
             'jumlahAlfa',
-            'jumlahBelumAbsen'
+            'jumlahBelumAbsen',
+            'listGuruHadir'
         ));
     }
 }

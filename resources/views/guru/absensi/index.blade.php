@@ -54,13 +54,6 @@
                             <td>{{ $guru->nama }}</td>
                           </tr>
                           <tr>
-                            <td style="font-weight: bold !important;">Prodi</td>
-                            <td style="width: 1px" class="px-2">
-                              :
-                            </td>
-                            <td>{{ $guru->jurusan_prodi }}</td>
-                          </tr>
-                          <tr>
                             <td style="font-weight: bold !important;">Mapel Mengajar</td>
                             <td style="width: 1px" class="px-2">
                               :

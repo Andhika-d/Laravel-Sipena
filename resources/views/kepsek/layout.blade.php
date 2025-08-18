@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@yield('title', 'Dashboard Guru')</title>
+  <title>@yield('title', 'Dashboard Kepsek')</title>
   <link rel="icon" href="{{ asset('images/favicon-32x32.png') }}" type="image/png">
   <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
   <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
   <style type="">
     .info-button {
         display: inline-block;
@@ -24,17 +23,64 @@
         background-color: #218c53; /* Warna latar belakang saat dihover */
     }
 
-    body.light-mode {
-            background-color: #fff;
-            color: #000;
-        }
+    #toggleButton {
+        border: none !important;
+        border-radius: 0 !important;
+        background: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        padding: 6px; /* atau sesuai kebutuhan */
+    }
 
-    /* Dark Mode */
-    body.dark-mode {
-            background-color: #000000;
-            color: #fff;
-        }
+
+            #toggleButton:focus,
+            #toggleButton:active {
+                outline: none !important;
+                box-shadow: none !important;
+                background-color: transparent !important;
+            }
+
+            #toggleButton:focus-visible {
+                outline: none !important;
+            }
+
+            .dark-mode {
+                background-color: #1e1e2f;
+                color: #e0e0e0;
+            }
+
+            .light-mode {
+                background-color: #ffffff;
+                color: #212529;
+            }
+
+            .transition-icon {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            }
+
+            #sunIcon.show {
+            transform: translateX(0);
+            opacity: 1;
+            }
+            #sunIcon.hide {
+            transform: translateX(-100%);
+            opacity: 0;
+            }
+
+            #moonIcon.show {
+            transform: translateX(0);
+            opacity: 1;
+            }
+            #moonIcon.hide {
+            transform: translateX(100%);
+            opacity: 0;
+            }
   </style>
+  @stack('styles')
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
@@ -78,49 +124,62 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
   <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Dapatkan elemen tombol dan status
-            const toggleButton = document.getElementById('toggleButton');
-            const toggleStatus = document.getElementById('toggleStatus');
+    document.addEventListener('DOMContentLoaded', function () {
+    const toggleButton = document.getElementById('toggleButton');
+    const toggleStatus = document.getElementById('toggleStatus');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
 
-            // Inisialisasi status tombol dari penyimpanan lokal
-            let isOn = localStorage.getItem('darkMode') === 'true';
+    let isOn = localStorage.getItem('darkMode') === 'true';
 
-            // Fungsi untuk menyimpan status mode ke penyimpanan lokal
-            function saveModeStatus() {
-                localStorage.setItem('darkMode', isOn.toString());
-            }
+    function saveModeStatus() {
+        localStorage.setItem('darkMode', isOn.toString());
+    }
 
-            function toggleMode() {
-                document.body.classList.toggle('light-mode', !isOn);
-                document.body.classList.toggle('dark-mode', isOn);
+    function toggleMode() {
+        // Body class
+        document.body.classList.toggle('dark-mode', isOn);
+        document.body.classList.toggle('light-mode', !isOn);
 
-                // Sesuaikan navbar (jika ada)
-                const navbar = document.querySelector('.navbar');
-                if (navbar) {
-                    navbar.classList.toggle('navbar-light', !isOn);
-                    navbar.classList.toggle('navbar-dark', isOn);
-                }
+        // Navbar (AdminLTE)
+        const navbar = document.querySelector('.main-header');
+        if (navbar) {
+        navbar.classList.toggle('navbar-dark', isOn);
+        navbar.classList.toggle('navbar-light', !isOn);
+        navbar.classList.toggle('bg-dark', isOn);
+        navbar.classList.toggle('bg-white', !isOn);
+        }
 
-                // Simpan status mode ke penyimpanan lokal
-                saveModeStatus();
-            }
+        // Update ikon dengan animasi
+        if (isOn) {
+        // Mode dark → tampilkan moon
+        sunIcon.classList.add('hide');
+        sunIcon.classList.remove('show');
+        moonIcon.classList.add('show');
+        moonIcon.classList.remove('hide');
+        } else {
+        // Mode light → tampilkan sun
+        sunIcon.classList.add('show');
+        sunIcon.classList.remove('hide');
+        moonIcon.classList.add('hide');
+        moonIcon.classList.remove('show');
+        }
 
-            // Tambahkan event listener untuk tombol
-            toggleButton.addEventListener('click', function () {
-                // Ubah status dan tampilan teks
-                isOn = !isOn;
-                toggleStatus.textContent = isOn ? 'Dark' : 'Light';
-                // Ubah warna latar belakang tombol
-                toggleButton.classList.toggle('btn-primary');
-                toggleButton.classList.toggle('btn-secondary');
-                // Ubah mode
-                toggleMode();
-            });
+        // Warna tombol
+        toggleButton.classList.toggle('btn-outline-dark', !isOn);
+        toggleButton.classList.toggle('btn-outline-light', isOn);
 
-            // Pemanggilan awal untuk mengatur mode berdasarkan status awal
-            toggleMode();
-        });
-    </script>
+        saveModeStatus();
+    }
+
+    toggleButton.addEventListener('click', function () {
+        isOn = !isOn;
+        toggleMode();
+    });
+
+    // Set awal saat page load
+    toggleMode();
+    });
+   </script>
 </body>
 </html>

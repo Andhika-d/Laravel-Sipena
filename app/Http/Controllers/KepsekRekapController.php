@@ -52,13 +52,19 @@ class KepsekRekapController extends Controller
         $sakit = $absensi->where('status_kehadiran', 'sakit')->count();
         $alfa  = $absensi->where('status_kehadiran', 'alfa')->count();
 
+        $totalHariAbsensi = $absensi->count(); // Termasuk semua status
         $totalHariKerja = $hadir_terverifikasi + $hadir_belum_verifikasi + $izin + $sakit + $alfa;
         $totalPoin = 
-        ($hadir_terverifikasi * 1) +
-        ($hadir_belum_verifikasi * 0.5) +
-        ($izin * 0.75) +
-        ($sakit * 0.75);
-        $persentase = $totalHariKerja > 0 ? round(($totalPoin / $totalHariKerja) * 100, 2) : 0;
+            ($hadir_terverifikasi * 1) +
+            ($hadir_belum_verifikasi * 0.5) +
+            ($izin * 0.75) +
+            ($sakit * 0.75);
+
+        if ($hadir_terverifikasi + $hadir_belum_verifikasi == 0) {
+            $persentase = 0;
+        } else {
+            $persentase = $totalHariKerja > 0 ? round(($totalPoin / $totalHariKerja) * 100, 2) : 0;
+        }
 
         $rekap[] = [
             'nama_guru' => $guru->nama,

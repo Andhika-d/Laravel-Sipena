@@ -30,38 +30,43 @@
           <div class="row">
           <div class="col-12">
             <div class="card">
-              <div class="card-header d-flex justify-content-between align-items-center">
+              <div class="card-header">
+                <div class="row align-items-center">
 
-                <div class="d-flex align-items-center ml-auto">
-                  <!-- Dropdown Filter Nama -->
-                  <form method="GET" action="{{ route('guru.penilaian') }}">
-                    <div class="input-group input-group-sm" style="width: 250px;">
-                      <select name="siswa_id" class="form-control" onchange="this.form.submit()">
-                        <option value="">-- Pilih Semua Siswa --</option>
-                        @foreach($siswa as $s)
+                  <!-- Dropdown Filter (kiri) -->
+                  <div class="col-md-6 mb-2 mb-md-0">
+                    <form method="GET" action="{{ route('guru.penilaian') }}" class="d-inline-block w-100" style="max-width: 300px;">
+                      @if ($siswaDropdown->isNotEmpty())
+                      <select name="siswa_id" class="form-control form-control-sm" onchange="this.form.submit()">
+                        <option value="">-- Pilih Siswa --</option>
+                        @foreach($siswaDropdown as $s)
                           <option value="{{ $s->id }}" {{ request('siswa_id') == $s->id ? 'selected' : '' }}>
                             {{ $s->nama }}
                           </option>
                         @endforeach
                       </select>
-                    </div>
-                  </form>
+                    @else
+                      <div class="text-muted small fst-italic">
+                        Belum ada siswa yang dinilai.
+                      </div>
+                    @endif
+                    </form>
+                  </div>
 
-                  <!-- Spacer -->
-                  <div style="width: 10px;"></div>
+                  <!-- Tombol Aksi (kanan) -->
+                  <div class="col-md-6 text-md-right text-start">
+                    <button type="button" class="btn btn-sm btn-primary me-2" data-toggle="modal" data-target="#tambahNilaiModal">
+                      <i class="fas fa-plus me-1"></i> Tambah
+                    </button>
 
-                  <!-- Button Tambah -->
-                  <button class="btn btn-primary btn-sm mr-2" data-toggle="modal" data-target="#tambahNilaiModal">
-                    <i class="fas fa-plus"></i> Tambah
-                  </button>
-
-                  <!-- Button Rekap -->
-                  <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#rekapModal">
-                    <i class="fas fa-file-csv"></i> Rekap Nilai
-                  </button>
+                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#rekapModal">
+                      <i class="fas fa-file-excel me-1"></i> Rekap
+                    </button>
+                  </div>
 
                 </div>
               </div>
+
               {{-- Statistik --}}
               <div class="card-body pt-3 pb-2">
                 <div class="row g-2">
@@ -119,7 +124,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach($nilaiHarian as $index => $nilai)
+                    @forelse($nilaiHarian as $index => $nilai)
                       <tr>
                         <td>{{ $nilaiHarian->firstItem() + $index }}</td>
                         <td>{{ $nilai->siswa->nama }}</td>
@@ -149,22 +154,60 @@
                         </td>
                         <td>{{ $nilai->nilai }}</td>
                         <td>
-                          <div class="d-flex align-items-center">
-                            <form action="{{ route('guru.penilaian.destroy', $nilai->id) }}" method="POST" onsubmit="return confirm('Yakin mau hapus nilai ini?')" class="mr-1">
-                              @csrf
-                              @method('DELETE')
-                              <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                <i class="fas fa-trash-alt"></i>
-                              </button>
-                            </form>
+                          <div class="d-flex align-items-center" style="gap: 5px;">
+
+                            <!-- Tombol Trigger Modal -->
+                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal{{ $nilai->id }}" title="Hapus">
+                              <i class="fas fa-trash-alt"></i>
+                            </button>
+
+                            <!-- Modal Konfirmasi -->
+                            <div class="modal fade" id="deleteModal{{ $nilai->id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ $nilai->id }}" aria-hidden="true">
+                              <div class="modal-dialog d-flex align-items-center justify-content-center" role="document" style="min-height: 100vh; margin: 0 auto;">
+                                <div class="modal-content border-0 shadow-sm rounded">
+                                  <div class="modal-header bg-danger py-2">
+                                    <h6 class="modal-title text-light d-flex align-items-center" id="deleteModalLabel{{ $nilai->id }}">
+                                      <i class="fas fa-exclamation-circle text-light mr-2"></i> Konfirmasi Hapus
+                                    </h6>
+                                    <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Tutup">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body text-center">
+                                    <p class="mb-3">Yakin ingin menghapus nilai ini?</p>
+                                    <div class="d-flex flex-column gap-2">
+                                      <form action="{{ route('guru.penilaian.destroy', $nilai->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-block mb-2">
+                                          <i class="fas fa-trash-alt mr-1"></i> Hapus
+                                        </button>
+                                      </form>
+                                      <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">
+                                        <i class="fas fa-times mr-1"></i> Batal
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Tombol Edit -->
                             <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editModal{{ $nilai->id }}" title="Edit">
                               <i class="fas fa-pen"></i>
                             </button>
                           </div>
                         </td>
                       </tr>
-                      @endforeach
+                    @empty
+                      <tr>
+                        <td colspan="7" class="text-center text-muted fst-italic py-4">
+                          Belum ada siswa yang dinilai. Silakan klik tombol <strong>"Tambah"</strong> untuk mulai mengisi nilai.
+                        </td>
+                      </tr>
+                    @endforelse
                   </tbody>
+
                 </table>
                 <div class="row mt-3">
                   <div class="col-12 d-flex justify-content-center justify-content-md-end">
@@ -204,7 +247,7 @@
                         <label for="siswa_id">Pilih Siswa</label>
                         <select name="siswa_id" id="siswa_id" class="form-control">
                           <option value="">-- Pilih Siswa --</option>
-                          @foreach ($siswa as $item)
+                          @foreach ($semuaSiswa as $item)
                             <option value="{{ $item->id }}">{{ $item->nama }} ({{ $item->kelas->nama }})</option>
                           @endforeach
                         </select>

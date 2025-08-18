@@ -16,7 +16,7 @@
         <div class="card-body">
 
             {{-- Filter Bulan & Export Excel --}}
-            <!-- <div class="card shadow-sm mb-4" style="border-left: 4px solid #007bff;">
+            <div class="card shadow-sm mb-4" style="border-left: 4px solid #007bff;">
               <div class="card-body">
                 {{-- Form Filter Bulan --}}
                 <form method="GET" action="{{ route('kepsek.rekap') }}">
@@ -46,9 +46,9 @@
                   </a>
                 </div>
               </div>
-            </div> -->
+            </div>
 
-            <!-- <div class="card shadow-sm">
+            <div class="card shadow-sm">
             <div class="card-header bg-light">
               <h3 class="card-title font-weight-bold">
                 <i class="fas fa-table mr-2"></i>Data Kehadiran Guru
@@ -62,7 +62,7 @@
                     <tr>
                       <th>No</th>
                       <th><i class="fas fa-user mr-1 text-secondary"></i> Nama Guru</th>
-                      <th><i class="fas fa-check-circle mr-1 text-success"></i> Hadir </th>
+                      <th><i class="fas fa-check-circle mr-1 text-success"></i> Hadir Lengkap</th>
                       <th><i class="fas fa-clock mr-1 text-warning"></i> Belum Absen Pulang </th>
                       <th>Izin</th>
                       <th>Sakit</th>
@@ -96,10 +96,10 @@
                 </p>
               </div>
             </div>
-          </div> -->
+          </div>
 
           {{-- Filter Bulan --}}
-          <form method="GET" action="{{ route('kepsek.rekap') }}">
+          <!-- <form method="GET" action="{{ route('kepsek.rekap') }}">
             <div class="row align-items-end mb-4">
                 <div class="col-md-4 col-sm-6">
                 <label for="bulan" class="font-weight-bold">Pilih Bulan:</label>
@@ -154,7 +154,7 @@
                 @endforelse
               </tbody>
             </table>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

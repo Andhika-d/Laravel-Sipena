@@ -55,11 +55,11 @@
   </ul>
   </li>
 
-  <li class="nav-item">
+  <!-- <li class="nav-item">
   <a href="#" class="nav-link collapsed" data-bs-toggle="modal" data-bs-target="#qrModal">
     <i class="bi bi-qr-code"></i><span>QR Absen</span>
   </a>
-  </li>
+  </li> -->
 
   <li class="nav-item">
     <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">

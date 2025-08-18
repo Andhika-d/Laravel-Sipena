@@ -86,7 +86,9 @@ Route::prefix('guru')->middleware('auth')->group(function () {
     Route::post('/absensi/masuk', [AbsensiGuruController::class, 'absenMasuk'])->name('guru.absen.masuk');
     Route::post('/absensi/pulang', [AbsensiGuruController::class, 'absenPulang'])->name('guru.absen.pulang');
     Route::post('/absensi/izin', [AbsensiGuruController::class, 'ajukanIzin'])->name('guru.absen.izin');
-    Route::get('/qr/absen/redirect', [QrAbsenController::class, 'redirect'])->name('qr.absen.redirect');
+    Route::get('/qr/absen/redirect', [QrAbsenController::class, 'redirect'])
+    ->middleware('auth')
+    ->name('qr.absen.redirect');
     Route::post('/qr/absen/handle', [QrAbsenController::class, 'handle'])->name('qr.absen.handle');
 
     Route::get('/penilaian', [PenilaianController::class, 'index'])->name('guru.penilaian');

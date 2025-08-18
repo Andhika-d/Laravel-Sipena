@@ -7,7 +7,6 @@
   <link rel="icon" href="{{ asset('images/favicon-32x32.png') }}" type="image/png">
   <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
   <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
-  <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
   <style type="">
     .info-button {
         display: inline-block;
@@ -70,8 +69,12 @@
             }
 
             #toggleButton {
+                border: none !important;
+                border-radius: 0 !important;
+                background: none !important;
                 outline: none !important;
                 box-shadow: none !important;
+                padding: 6px; /* atau sesuai kebutuhan */
             }
 
             #toggleButton:focus,
@@ -120,7 +123,6 @@
             transform: translateX(100%);
             opacity: 0;
             }
-
   </style>
   @stack('styles')
 </head>
@@ -201,14 +203,12 @@
         sunIcon.classList.remove('show');
         moonIcon.classList.add('show');
         moonIcon.classList.remove('hide');
-        toggleStatus.textContent = 'Dark';
         } else {
         // Mode light → tampilkan sun
         sunIcon.classList.add('show');
         sunIcon.classList.remove('hide');
         moonIcon.classList.add('hide');
         moonIcon.classList.remove('show');
-        toggleStatus.textContent = 'Light';
         }
 
         // Warna tombol

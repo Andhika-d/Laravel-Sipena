@@ -27,43 +27,79 @@ class QrAbsenController extends Controller
         return view('admin.qr-absen', compact('scanUrl'));
     }
     public function handle(Request $request)
-{
-    if (!Auth::check()) {
-        session(['qr_absen_redirect' => route('qr.absen.redirect')]);
-        return redirect()->route('login');
-    }
+    {
+        if (!Auth::check()) {
+            session(['qr_absen_redirect' => route('qr.absen.redirect')]);
+            return redirect()->route('login');
+        }
+        
+        if (!$request->filled('latitude') || !$request->filled('longitude')) {
+        return redirect()->route('qr.absen.redirect');
+        }
 
-    $user = Auth::user();
-    $today = Carbon::today();
-
-    // ⛔ Cek dulu: kalau udah absen masuk & pulang, langsung kasih info
-    $absensi = AbsensiGuru::where('user_id', $user->id)
-        ->whereDate('tanggal', $today)
-        ->first();
-
-    if ($absensi && $absensi->jam_pulang) {
-        return redirect()->route('guru.absensi')->with([
-            'modal_success' => true,
-            'success_message' => 'Anda sudah menyelesaikan absen hari ini.',
-            'jarak' => null,
-        ]);
-    }
-
-    // ✅ Kalau udah absen masuk aja
-    if ($absensi && !$absensi->jam_pulang) {
+        $user = Auth::user();
+        $today = Carbon::today();
         $now = Carbon::now();
         $minimalJamPulang = Carbon::createFromTime(14, 0);
 
-        if ($now->lt($minimalJamPulang)) {
+        $absensi = AbsensiGuru::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->first();
+
+        // ✅ Sudah absen masuk & pulang
+        if ($absensi && $absensi->jam_pulang) {
             return redirect()->route('guru.absensi')->with([
-                'modal_info' => true,
-                'info_message' => 'Anda sudah melakukan absen masuk hari ini.
-                                   Jika ingin melakukan absen pulang menggunakan QR, silakan logout terlebih dahulu, lalu scan ulang QR code.',
+                'modal_success' => true,
+                'success_message' => 'Absensi hari ini sudah selesai. Tidak perlu scan QR lagi. 👍',
                 'jarak' => null,
             ]);
         }
 
-        // Kalau udah jam 14.00, baru cek lokasi
+        // ✅ Sudah absen masuk, belum pulang
+        if ($absensi && !$absensi->jam_pulang) {
+            if ($now->lt($minimalJamPulang)) {
+                return redirect()->route('guru.absensi')->with([
+                    'modal_info' => true,
+                    'info_message' => 'Absen masuk sudah tercatat. Silakan scan ulang QR setelah jam 14.00 untuk absen pulang.',
+                    'jarak' => null,
+                ]);
+            }
+
+            // Cek lokasi
+            $lokasiUser = [
+                'latitude' => $request->input('latitude'),
+                'longitude' => $request->input('longitude'),
+            ];
+
+            $lokasiKantor = [
+                'latitude' => -6.075743,
+                'longitude' => 106.093441,
+            ];
+
+            $jarak = $this->hitungJarak($lokasiUser, $lokasiKantor);
+
+            if ($jarak > 0.1) {
+                return redirect()->route('guru.absensi')->with([
+                    'modal_error' => true,
+                    'error_message' => 'Anda berada di luar area kantor. Absen pulang hanya dapat dilakukan di lokasi yang ditentukan.',
+                    'jarak' => $jarak,
+                ]);
+            }
+
+            // ✅ Catat jam pulang
+            $absensi->update([
+                'jam_pulang' => $now,
+                'status_verifikasi' => true,
+            ]);
+
+            return redirect()->route('guru.absensi')->with([
+                'modal_success' => true,
+                'success_message' => 'Absen pulang berhasil. Terima kasih dan sampai jumpa besok! 🙌',
+                'jarak' => $jarak,
+            ]);
+        }
+
+        // ✅ Belum absen sama sekali → absen masuk
         $lokasiUser = [
             'latitude' => $request->input('latitude'),
             'longitude' => $request->input('longitude'),
@@ -79,61 +115,29 @@ class QrAbsenController extends Controller
         if ($jarak > 0.1) {
             return redirect()->route('guru.absensi')->with([
                 'modal_error' => true,
-                'error_message' => 'Lokasi anda terlalu jauh dari kantor untuk absen pulang.',
+                'error_message' => 'Lokasi Anda terlalu jauh dari kantor. Silakan berada di sekitar lokasi kantor untuk absen.',
                 'jarak' => $jarak,
             ]);
         }
 
-        // Simpan jam pulang
-        $absensi->update(['jam_pulang' => $now]);
+        $isTelat = $now->gt(Carbon::createFromTime(8, 0));
+
+        AbsensiGuru::create([
+            'user_id' => $user->id,
+            'tanggal' => $today,
+            'jam_masuk' => $now,
+            'is_telat' => $isTelat,
+            'status_kehadiran' => 'hadir',
+        ]);
 
         return redirect()->route('guru.absensi')->with([
             'modal_success' => true,
-            'success_message' => 'Absen pulang berhasil.',
+            'success_message' => $isTelat
+                ? 'Absen masuk berhasil, namun Anda terlambat. Harap lebih tepat waktu ke depannya.'
+                : 'Absen masuk berhasil. Selamat bekerja! 💼',
             'jarak' => $jarak,
         ]);
     }
-
-    // 📌 Kalau belum absen sama sekali
-    $lokasiUser = [
-        'latitude' => $request->input('latitude'),
-        'longitude' => $request->input('longitude'),
-    ];
-
-    $lokasiKantor = [
-        'latitude' => -6.075743,
-        'longitude' => 106.093441,
-    ];
-
-    $jarak = $this->hitungJarak($lokasiUser, $lokasiKantor);
-
-    if ($jarak > 0.1) {
-        return redirect()->route('guru.absensi')->with([
-            'modal_error' => true,
-            'error_message' => 'Lokasi anda terlalu jauh dari kantor.',
-            'jarak' => $jarak,
-        ]);
-    }
-
-    $now = Carbon::now();
-    $isTelat = $now->gt(Carbon::createFromTime(8, 0));
-
-    AbsensiGuru::create([
-        'user_id' => $user->id,
-        'tanggal' => $today,
-        'jam_masuk' => $now,
-        'is_telat' => $isTelat,
-        'status_kehadiran' => 'hadir',
-    ]);
-
-    return redirect()->route('guru.absensi')->with([
-        'modal_success' => true,
-        'success_message' => $isTelat
-            ? 'Anda berhasil absen, namun terlambat.'
-            : 'Absen masuk berhasil.',
-        'jarak' => $jarak,
-    ]);
-}
 
 
     // Tambahkan fungsi bantu untuk hitung jarak

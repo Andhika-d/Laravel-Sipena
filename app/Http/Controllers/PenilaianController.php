@@ -16,7 +16,12 @@ class PenilaianController extends Controller
     // TAMPILAN UTAMA PENILAIAN
     public function index(Request $request)
 {
-    $siswa = Siswa::with('kelas')->get();
+    $siswaDropdown = Siswa::whereHas('nilaiHarian', function ($q) {
+    $q->where('guru_id', Auth::user()->guru->id);
+    })->with('kelas')->get();
+
+    $semuaSiswa = Siswa::with('kelas')->get(); // Buat modal input
+
     $mapels = Mapel::all();
     $kelases = Kelas::all();
     $kkm = 75;
@@ -39,8 +44,8 @@ class PenilaianController extends Controller
     $jumlahTidakLulus = $allData->where('nilai', '<', $kkm)->count();
 
     return view('guru.penilaian.index', compact(
-        'siswa', 'mapels', 'nilaiHarian', 'kelases',
-        'kkm', 'rataRataNilai', 'jumlahLulus', 'jumlahTidakLulus','allData'
+    'siswaDropdown', 'semuaSiswa', 'mapels', 'nilaiHarian', 'kelases',
+    'kkm', 'rataRataNilai', 'jumlahLulus', 'jumlahTidakLulus','allData'
     ));
 }   
 
