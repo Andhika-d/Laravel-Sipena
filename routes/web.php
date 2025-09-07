@@ -16,6 +16,7 @@ use App\Http\Controllers\MapelController;
 use App\Http\Controllers\UserKepsekController;
 use App\Http\Controllers\KepsekRekapController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdvanceController;
 use App\Exports\RekapAbsensiExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -56,6 +57,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
   //CRUD data Guru
   Route::post('/guru', [GuruController::class, 'store'])->name('admin.guru.store');
+  Route::post('/guru/import', [GuruController::class, 'import'])->name('guru.import');
   Route::put('/guru/{id}', [GuruController::class, 'update'])->name('admin.guru.update');
   Route::delete('/guru/{id}', [GuruController::class, 'destroy'])->name('admin.guru.destroy');
 
@@ -77,6 +79,12 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
   // Mapel CRUD
   Route::resource('mapel', MapelController::class)->names('admin.mapel');
   Route::post('mapel/import', [MapelController::class, 'import'])->name('admin.mapel.import');
+
+  //Advance
+  Route::prefix('advance')->name('admin.advance.')->group(function () {
+      Route::get('/settingjam', [AdvanceController::class, 'settingJam'])->name('settingjam');
+      Route::put('/settingjam', [AdvanceController::class, 'updateJam'])->name('updatejam');
+  });
 });
 
 Route::prefix('guru')->middleware('auth')->group(function () {

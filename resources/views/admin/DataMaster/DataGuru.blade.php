@@ -57,59 +57,116 @@
                 <div style="min-width: 250px;">
                   <input type="text" id="searchGuru" class="form-control form-control-sm" placeholder="Cari Guru...">
                 </div>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
-                  <i class="bi bi-plus-lg"></i> Guru
-                </button>
+                
+                <div class="d-flex gap-2">
+                  <!-- Tombol Upload Excel -->
+                  <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalUploadExcel">
+                    <i class="bi bi-file-earmark-excel"></i> Upload Excel
+                  </button>
+
+                  <!-- Tombol Tambah Guru -->
+                  <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahGuru">
+                    <i class="bi bi-plus-lg"></i> Guru
+                  </button>
+                </div>
+              </div>
+
+              <!-- Modal Upload Excel -->
+              <div class="modal fade" id="modalUploadExcel" tabindex="-1" aria-labelledby="modalUploadExcelLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="modalUploadExcelLabel">Upload Data Guru via Excel</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form id="formUploadExcel" action="{{ route('guru.import') }}" method="POST" enctype="multipart/form-data">
+                      @csrf
+                      <div class="mb-3">
+                        <label for="fileExcel" class="form-label">Pilih File Excel</label>
+                        <input class="form-control" type="file" id="fileExcel" name="fileExcel" accept=".xls,.xlsx" required>
+                      </div>
+                      <div class="alert alert-info">
+                        Format kolom: <strong>nama, jenis_kelamin, tipe_guru, kelas_nama, mapel_nama</strong><br>
+                        <small>Contoh isi file: <code>Andhika,L,kelas,1A,</code></small>
+                      </div>
+                    </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                      <button type="submit" class="btn btn-success" form="formUploadExcel">Upload</button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Modal Tambah Guru -->
               <div class="modal fade" id="modalTambahGuru" tabindex="-1">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <form autocomplete="off" action="{{ route('admin.guru.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-header">
-                      <h5 class="modal-title">Tambah Data Guru</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                    </div>
-                    <div class="modal-body">
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="floatingNama" name="nama" placeholder="Nama">
-                      <label for="floatingNama">Nama</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                      <select class="form-select" id="floatingJk" name="jk" aria-label="Pilih jenis kelamin">
-                        <option selected disabled>-</option>
-                        <option value="L">Laki-laki</option>
-                        <option value="P">Perempuan</option>
-                      </select>
-                      <label for="floatingJk">Jenis Kelamin</label>
-                    </div>
-                    <div class="mb-3">
-                      <label for="floatingMengajar" class="form-label">Mengajar</label>
-                      <select name="mapel[]" id="floatingMengajar" class="form-select" multiple>
-                        @foreach ($mapels as $m)
-                          <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
-                        @endforeach
-                      </select>
-                    </div>
-                    <div class="form-floating mb-3">
-                    <select class="form-select" id="floatingKelas" name="kelas_id" required>
-                      <option selected disabled>Pilih Kelas</option>
-                      @foreach ($kelases as $kelas)
-                        <option value="{{ $kelas->id }}">{{ $kelas->nama }}</option>
-                      @endforeach
-                    </select>
-                    <label for="floatingKelas">Kelas</label>
-                    </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                      <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                  </form>
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <form autocomplete="off" action="{{ route('admin.guru.store') }}" method="POST">
+                      @csrf
+                      <div class="modal-header">
+                        <h5 class="modal-title">Tambah Data Guru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                      </div>
+
+                      <div class="modal-body">
+                        <!-- Nama -->
+                        <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="floatingNama" name="nama" placeholder="Nama" required>
+                          <label for="floatingNama">Nama</label>
+                        </div>
+
+                        <!-- Jenis Kelamin -->
+                        <div class="form-floating mb-3">
+                          <select class="form-select" id="floatingJk" name="jenis_kelamin" aria-label="Pilih jenis kelamin" required>
+                            <option selected disabled>-</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                          </select>
+                          <label for="floatingJk">Jenis Kelamin</label>
+                        </div>
+
+                        <!-- Tipe Guru -->
+                        <div class="form-floating mb-3">
+                          <select class="form-select" id="floatingTipeGuru" name="tipe_guru" required>
+                            <option selected disabled>-</option>
+                            <option value="kelas">Guru Kelas</option>
+                            <option value="mapel">Guru Mapel Khusus</option>
+                          </select>
+                          <label for="floatingTipeGuru">Tipe Guru</label>
+                        </div>
+
+                        <!-- Pilih Kelas (hanya untuk Guru Kelas) -->
+                        <div class="form-floating mb-3" id="kelasWrapper" style="display:none;">
+                          <select class="form-select" id="floatingKelas" name="kelas_id">
+                            <option selected disabled>Pilih Kelas</option>
+                            @foreach ($kelases as $kelas)
+                              <option value="{{ $kelas->id }}">{{ $kelas->nama }}</option>
+                            @endforeach
+                          </select>
+                          <label for="floatingKelas">Kelas</label>
+                        </div>
+
+                        <!-- Pilih Mapel (hanya untuk Guru Mapel Khusus) -->
+                        <div class="mb-3" id="mapelWrapper" style="display:none;">
+                          <label for="floatingMengajar" class="form-label">Mengajar</label>
+                          <select name="mapel[]" id="floatingMengajar" class="form-select" multiple>
+                            @foreach ($mapels as $m)
+                              <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                            @endforeach
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-              </div>
               </div>
 
               <!-- Default Table -->
@@ -171,11 +228,13 @@
                         </div>
                         <div class="modal-body">
 
+                          <!-- Nama -->
                           <div class="form-floating mb-3">
                             <input type="text" class="form-control" name="nama" value="{{ $guru->nama }}" placeholder="Nama">
                             <label>Nama</label>
                           </div>
 
+                          <!-- Jenis Kelamin -->
                           <div class="form-floating mb-3">
                             <select class="form-select" name="jenis_kelamin" aria-label="Pilih jenis kelamin">
                               <option value="L" {{ $guru->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
@@ -184,24 +243,35 @@
                             <label>Jenis Kelamin</label>
                           </div>
 
-                          <div class="mb-3">
-                            <label for="editMapelSelect{{ $guru->id }}" class="form-label">Mapel yang Diampu</label>
-                            <select class="form-select" name="mapel_ids[]" multiple id="editMapelSelect{{ $guru->id }}">
-                              @foreach ($mapels as $mapel)
-                                <option value="{{ $mapel->id }}" {{ $guru->mapel->contains($mapel->id) ? 'selected' : '' }}>
-                                  {{ $mapel->nama_mapel }}
+                          <!-- Tipe Guru -->
+                          <div class="form-floating mb-3">
+                            <select class="form-select tipe-guru-select" name="tipe_guru" data-target="{{ $guru->id }}">
+                              <option value="kelas" {{ $guru->tipe_guru == 'kelas' ? 'selected' : '' }}>Guru Kelas</option>
+                              <option value="mapel" {{ $guru->tipe_guru == 'mapel' ? 'selected' : '' }}>Guru Mapel Khusus</option>
+                            </select>
+                            <label>Tipe Guru</label>
+                          </div>
+
+                          <!-- Kelas -->
+                          <div class="mb-3 kelas-wrapper-{{ $guru->id }}" style="{{ $guru->tipe_guru == 'mapel' ? 'display:none;' : '' }}">
+                            <label for="editKelasSelect{{ $guru->id }}" class="form-label">Kelas</label>
+                            <select class="form-select" name="kelas_id" id="editKelasSelect{{ $guru->id }}">
+                              <option disabled>Pilih Kelas</option>
+                              @foreach ($kelases as $kelas)
+                                <option value="{{ $kelas->id }}" {{ $guru->kelas_id == $kelas->id ? 'selected' : '' }}>
+                                  {{ $kelas->nama }}
                                 </option>
                               @endforeach
                             </select>
                           </div>
 
-                          <div class="mb-3">
-                            <label for="editKelasSelect{{ $guru->id }}" class="form-label">Kelas</label>
-                            <select class="form-select" name="kelas_id" id="editKelasSelect{{ $guru->id }}" required>
-                              <option disabled>Pilih Kelas</option>
-                              @foreach ($kelases as $kelas)
-                                <option value="{{ $kelas->id }}" {{ $guru->kelas_id == $kelas->id ? 'selected' : '' }}>
-                                  {{ $kelas->nama }}
+                          <!-- Mapel -->
+                          <div class="mb-3 mapel-wrapper-{{ $guru->id }}" style="{{ $guru->tipe_guru == 'kelas' ? 'display:none;' : '' }}">
+                            <label for="editMapelSelect{{ $guru->id }}" class="form-label">Mapel yang Diampu</label>
+                            <select class="form-select" name="mapel_ids[]" multiple id="editMapelSelect{{ $guru->id }}">
+                              @foreach ($mapels as $mapel)
+                                <option value="{{ $mapel->id }}" {{ $guru->mapel->contains($mapel->id) ? 'selected' : '' }}>
+                                  {{ $mapel->nama_mapel }}
                                 </option>
                               @endforeach
                             </select>
@@ -258,6 +328,48 @@
       });
     });
   </script>
+
+  <script>
+  // JS untuk switch field sesuai tipe guru
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipeSelect = document.getElementById('floatingTipeGuru');
+    const kelasWrapper = document.getElementById('kelasWrapper');
+    const mapelWrapper = document.getElementById('mapelWrapper');
+
+    tipeSelect.addEventListener('change', function () {
+      if (this.value === 'kelas') {
+        kelasWrapper.style.display = 'block';
+        mapelWrapper.style.display = 'none';
+      } else if (this.value === 'mapel') {
+        kelasWrapper.style.display = 'none';
+        mapelWrapper.style.display = 'block';
+      } else {
+        kelasWrapper.style.display = 'none';
+        mapelWrapper.style.display = 'none';
+      }
+    });
+  });
+  </script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.tipe-guru-select').forEach(function(select) {
+    select.addEventListener('change', function () {
+      let target = this.dataset.target;
+      let kelasWrapper = document.querySelector('.kelas-wrapper-' + target);
+      let mapelWrapper = document.querySelector('.mapel-wrapper-' + target);
+
+      if (this.value === 'kelas') {
+        kelasWrapper.style.display = 'block';
+        mapelWrapper.style.display = 'none';
+      } else {
+        kelasWrapper.style.display = 'none';
+        mapelWrapper.style.display = 'block';
+      }
+    });
+  });
+});
+</script>
 
 </body>
 

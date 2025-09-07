@@ -21,20 +21,22 @@
 
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>Data Mapel</h1>
+    <h1>Data Mata Pelajaran</h1>
   </div>
 
   <section class="section">
     <div class="card">
       <div class="card-body pt-4">
-        <div class="d-flex align-items-center mb-3">
-          <h5 class="card-title mb-0">Daftar Mata Pelajaran</h5>
-          <div class="d-flex gap-2 ms-auto">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalUploadMapel">
-              <i class="bi bi-upload"></i> Upload Excel
+        <div class="d-flex flex-wrap align-items-center mb-3">
+          <h5 class="card-title mb-2 mb-sm-0">Daftar Mapel</h5>
+          <div class="d-flex flex-wrap gap-2 ms-auto">
+            <button class="btn btn-success btn-sm d-flex align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#modalUploadMapel">
+              <i class="bi bi-upload me-1"></i> Upload
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahMapel">
-              <i class="bi bi-plus-lg"></i> Tambah
+            <button class="btn btn-primary btn-sm d-flex align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#modalTambahMapel">
+              <i class="bi bi-plus-lg me-1"></i> Tambah
             </button>
           </div>
         </div>
@@ -84,7 +86,7 @@
           </div>
           @endif
 
-        <table class="table table-bordered">
+        <table id="tabelMapel" class="table table-bordered">
           <thead>
             <tr>
               <th>No</th>
@@ -224,6 +226,22 @@
       });
     </script>
     @endif
+
+    <script>
+  document.addEventListener("DOMContentLoaded", () => {
+  new simpleDatatables.DataTable("#tabelMapel", {
+    searchable: true,
+    fixedHeight: true,
+    perPage: 5,
+    labels: {
+      perPage: "",          // kosongkan tulisan "entries"
+      noRows: "Tidak ada data",
+      info: "Menampilkan {start} sampai {end} dari {rows} mata pelajaran",
+      search: "Cari:",
+    }
+  });
+});
+</script>
 
 </body>
 </html>

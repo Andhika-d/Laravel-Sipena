@@ -72,8 +72,8 @@ class QrAbsenController extends Controller
             ];
 
             $lokasiKantor = [
-                'latitude' => -6.075743,
-                'longitude' => 106.093441,
+                'latitude' => -6.075751,
+                'longitude' => 106.093429,
             ];
 
             $jarak = $this->hitungJarak($lokasiUser, $lokasiKantor);
@@ -106,8 +106,8 @@ class QrAbsenController extends Controller
         ];
 
         $lokasiKantor = [
-            'latitude' => -6.075743,
-            'longitude' => 106.093441,
+            'latitude' => -6.075751,
+            'longitude' => 106.093429,
         ];
 
         $jarak = $this->hitungJarak($lokasiUser, $lokasiKantor);

@@ -28,14 +28,16 @@
   <section class="section">
     <div class="card">
       <div class="card-body pt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="card-title">Daftar Siswa</h5>
-          <div>
-            <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#modalUploadSiswa">
-              <i class="bi bi-upload"></i> Upload Excel
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+          <h5 class="card-title mb-2 mb-sm-0">Daftar Siswa</h5>
+          <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-success btn-sm d-flex align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#modalUploadSiswa">
+              <i class="bi bi-upload me-1"></i> Upload
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahSiswa">
-              <i class="bi bi-plus-lg"></i> Tambah
+            <button class="btn btn-primary btn-sm d-flex align-items-center"
+                    data-bs-toggle="modal" data-bs-target="#modalTambahSiswa">
+              <i class="bi bi-plus-lg me-1"></i> Tambah
             </button>
           </div>
         </div>
@@ -60,6 +62,7 @@
         </div>
         @endif
 
+        @php $errorsImport = session()->pull('import_errors'); @endphp
         @if(session('import_errors'))
         <!-- Modal Import Error -->
         <div class="modal fade" id="modalImportError" tabindex="-1">
@@ -85,6 +88,13 @@
         </div>
         @endif
 
+        <div class="table-responsive">
+          <form method="GET" action="{{ route('admin.siswa.index') }}" class="mb-3">
+              <div class="input-group">
+                  <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Cari nama atau NIS">
+                  <button class="btn btn-primary">Cari</button>
+              </div>
+          </form>
         <table class="table table-bordered">
           <thead>
             <tr>
@@ -159,6 +169,10 @@
             @endforeach
           </tbody>
         </table>
+        <div>
+            {{ $siswas->links() }}
+        </div>
+        </div>
       </div>
     </div>
   </section>
@@ -218,7 +232,7 @@
           </div>
           <div class="alert alert-info">
             Format: <strong>nama, nis, kelas</strong><br>
-            <small>Contoh kelas: <code>X IPA 1</code>, <code>XI IPS 2</code></small>
+            <small>Contoh kelas: <code>1A</code>, <code>2B</code></small>
           </div>
         </div>
         <div class="modal-footer">

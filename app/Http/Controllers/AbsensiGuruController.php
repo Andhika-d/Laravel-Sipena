@@ -4,52 +4,51 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\AbsensiGuru;
+use App\Models\PengaturanJam;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-/**
- * @param \Illuminate\Http\Request $request
- * @return \Illuminate\Http\RedirectResponse
- *
- * @property string $status_kehadiran
- * @property string|null $deskripsi
- * @property \Illuminate\Http\UploadedFile|null $file_pendukung
- */
 
 class AbsensiGuruController extends Controller
 {
     // Halaman form absensi
     public function index()
-{
-    $user = Auth::user();
-    $guru = $user->guru;
-    if ($guru) {
-        $guru->load('mapel');
+    {
+        $user = Auth::user();
+        $guru = $user->guru;
+        if ($guru) {
+            $guru->load('mapel');
+        }
+
+        $today = Carbon::today();
+        $now = Carbon::now();
+
+        // 🔑 Ambil dari tabel pengaturan_jam
+        $jamPengaturan = PengaturanJam::first();
+        $jamMasukMulai = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_masuk_mulai) : Carbon::createFromTime(6,0);
+        $jamMasukSelesai = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_masuk_selesai) : Carbon::createFromTime(7,30);
+        $jamTelat       = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_telat) : Carbon::createFromTime(8,0);
+        $jamPulang      = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_pulang) : Carbon::createFromTime(14,0);
+
+        $absenHariIni = AbsensiGuru::where('user_id', $user->id)
+            ->whereDate('tanggal', $today)
+            ->first();
+        
+        $lokasiKantor = [
+            'latitude' => -6.075751,
+            'longitude' => 106.093429
+        ];
+
+        return view('guru.absensi.index', compact(
+            'guru',
+            'absenHariIni',
+            'now',
+            'jamMasukMulai',
+            'jamMasukSelesai',
+            'jamTelat',
+            'jamPulang',
+            'lokasiKantor'
+        ));
     }
-    $today = Carbon::today();
-    $now = Carbon::now();
-    $jamMasukMulai = Carbon::createFromTime(6, 0);
-    $jamMasukSelesai = Carbon::createFromTime(7, 30);
-    $jamPulang = Carbon::createFromTime(14, 0);
-
-    $absenHariIni = AbsensiGuru::where('user_id', $user->id)
-        ->whereDate('tanggal', $today)
-        ->first();
-    
-    $lokasiKantor = [
-        'latitude' => -6.075743,
-        'longitude' => 106.093441 
-    ];
-
-    return view('guru.absensi.index', compact(
-        'guru',
-        'absenHariIni',
-        'now',
-        'jamMasukMulai',
-        'jamMasukSelesai',
-        'jamPulang',
-        'lokasiKantor'
-    ));
-}
 
     // Absen masuk (hadir atau telat)
     public function absenMasuk(Request $request)
@@ -57,6 +56,9 @@ class AbsensiGuruController extends Controller
         $user = Auth::user();
         $today = Carbon::today();
         $now = Carbon::now();
+
+        $jamPengaturan = PengaturanJam::first();
+        $jamTelat = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_telat) : Carbon::createFromTime(8,0);
 
         $sudahAbsen = AbsensiGuru::where('user_id', $user->id)
             ->whereDate('tanggal', $today)
@@ -66,26 +68,28 @@ class AbsensiGuruController extends Controller
             return back()->with('error', 'Anda sudah absen hari ini.');
         }
 
-        $isTelat = $now->gt(Carbon::createFromTime(8, 0, 0)); // telat jika lewat jam 8
+        $isTelat = $now->gt($jamTelat);
 
         AbsensiGuru::create([
             'user_id' => $user->id,
             'tanggal' => $today,
             'jam_masuk' => $now,
             'is_telat' => $isTelat,
-            'status_kehadiran' => 'hadir', // <<< tambahin ini bro
+            'status_kehadiran' => 'hadir',
         ]);
-
 
         return back()->with('success', $isTelat ? 'Anda absen telat.' : 'Absen masuk berhasil.');
     }
 
-    // Absen pulang (hanya bisa setelah jam 14.00)
+    // Absen pulang
     public function absenPulang(Request $request)
     {
         $user = Auth::user();
         $today = Carbon::today();
         $now = Carbon::now();
+
+        $jamPengaturan = PengaturanJam::first();
+        $jamPulang = $jamPengaturan ? Carbon::createFromFormat('H:i', $jamPengaturan->jam_pulang) : Carbon::createFromTime(14,0);
 
         $absen = AbsensiGuru::where('user_id', $user->id)
             ->whereDate('tanggal', $today)
@@ -95,8 +99,8 @@ class AbsensiGuruController extends Controller
             return back()->with('error', 'Data absen tidak ditemukan atau Anda sudah absen pulang.');
         }
 
-        if ($now->lt(Carbon::createFromTime(14, 0, 0))) {
-            return back()->with('error', 'Absen pulang hanya bisa dilakukan setelah jam 14.00.');
+        if ($now->lt($jamPulang)) {
+            return back()->with('error', 'Absen pulang hanya bisa dilakukan setelah jam '.$jamPulang->format('H:i').'.');
         }
 
         $absen->update([
@@ -107,6 +111,7 @@ class AbsensiGuruController extends Controller
         return back()->with('success', 'Absen pulang berhasil.');
     }
 
+    // Ajukan izin
     public function ajukanIzin(Request $request)
     {
         $request->validate([

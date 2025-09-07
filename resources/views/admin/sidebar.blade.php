@@ -61,6 +61,29 @@
   </a>
   </li> -->
 
+  <!-- Advance Menu -->
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('admin.advance.*') ? '' : 'collapsed' }}" 
+       data-bs-target="#advance-nav" 
+       data-bs-toggle="collapse" 
+       href="#">
+      <i class="bi bi-sliders"></i><span>Advance</span><i class="bi bi-chevron-down ms-auto"></i>
+    </a>
+
+    <ul id="advance-nav" 
+        class="nav-content collapse {{ request()->routeIs('admin.advance.*') ? 'show' : '' }}" 
+        data-bs-parent="#sidebar-nav">
+
+      <li>
+        <a href="{{ route('admin.advance.settingjam') }}" 
+           class="{{ request()->routeIs('admin.advance.settingjam') ? 'active' : '' }}">
+          <i class="bi bi-circle"></i><span>Setting Jam</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+  <!-- End Advance Menu -->
+
   <li class="nav-item">
     <a class="nav-link collapsed" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
       <i class="bi bi-box-arrow-right"></i>

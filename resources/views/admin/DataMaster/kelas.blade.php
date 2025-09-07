@@ -44,12 +44,14 @@
       <div class="card-body pt-4">
         <div class="d-flex align-items-center mb-3">
           <h5 class="card-title mb-0">Daftar Kelas</h5>
-          <div class="d-flex gap-2 ms-auto">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalImportKelas">
-              <i class="bi bi-upload"></i> Upload Excel
+          <div class="d-flex flex-wrap gap-2 ms-auto">
+            <button class="btn btn-success btn-sm d-flex align-items-center" 
+                    data-bs-toggle="modal" data-bs-target="#modalImportKelas">
+              <i class="bi bi-file-earmark-excel me-1"></i> Upload
             </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahKelas">
-              <i class="bi bi-plus-lg"></i> Tambah
+            <button class="btn btn-primary btn-sm d-flex align-items-center" 
+                    data-bs-toggle="modal" data-bs-target="#modalTambahKelas">
+              <i class="bi bi-plus-lg me-1"></i> Tambah
             </button>
           </div>
         </div>
@@ -99,7 +101,7 @@
           </div>
           @endif
 
-        <table class="table table-bordered">
+        <table id="tabelKelas" class="table table-bordered">
           <thead>
             <tr>
               <th>No</th>
@@ -229,27 +231,15 @@
 
   <!-- Template Main JS File -->
   <script src="{{ asset('assets/js/main.js') }}"></script>
-  <!-- Manual JS -->
-  <script>
-  document.getElementById('searchGuru').addEventListener('keyup', function () {
-    const keyword = this.value.toLowerCase();
-    const rows = document.querySelectorAll('table tbody tr');
-
-    rows.forEach(row => {
-      const rowText = row.textContent.toLowerCase();
-      row.style.display = rowText.includes(keyword) ? '' : 'none';
-      });
-    });
-  </script>
 
     @if(session('success') && !session('import_errors'))
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-      modal.show();
-    });
-  </script>
-  @endif
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+        modal.show();
+      });
+    </script>
+    @endif
 
   @if(session('import_errors'))
   <script>
@@ -259,6 +249,22 @@
     });
   </script>
   @endif
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+  new simpleDatatables.DataTable("#tabelKelas", {
+    searchable: true,
+    fixedHeight: true,
+    perPage: 5,
+    labels: {
+      perPage: "",          // kosongkan tulisan "entries"
+      noRows: "Tidak ada data",
+      info: "Menampilkan {start} sampai {end} dari {rows} nama kelas",
+      search: "Cari:",
+    }
+  });
+});
+</script>
 
 </body>
 </html>

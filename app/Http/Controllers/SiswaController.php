@@ -12,11 +12,22 @@ use App\Imports\SiswaImport;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $siswas = Siswa::with('kelas')->get();
+        $search = $request->input('search');
+
+        $query = Siswa::with('kelas');
+
+        if ($search) {
+            $query->where('nama', 'like', "%{$search}%")
+                ->orWhere('nis', 'like', "%{$search}%");
+        }
+
+        $siswas = $query->orderBy('nama')->paginate(5)->appends($request->query());
+
         $kelases = Kelas::all();
-        return view('admin.datamaster.siswa', compact('siswas', 'kelases'));
+
+        return view('admin.datamaster.siswa', compact('siswas', 'kelases', 'search'));
     }
 
     public function import(Request $request)
@@ -25,10 +36,7 @@ class SiswaController extends Controller
         'file' => 'required|file|mimes:xlsx,xls',
     ]);
 
-    $import = new SiswaImport();
-    Excel::import($import, $request->file('file'));
-    $rows = $import->rows;
-
+    $rows = Excel::toCollection(new SiswaImport, $request->file('file'))->first();
 
     DB::beginTransaction();
     $errors = [];
@@ -39,28 +47,27 @@ class SiswaController extends Controller
 
             $nama = trim($row[0] ?? '');
             $nis = trim($row[1] ?? '');
-            $nama_kelas = trim($row[2] ?? '');
+            $nama_kelas = strtoupper(trim($row[2] ?? ''));
 
-            // Cek kelengkapan
+            // Ambil hanya "2A", "3B" → buang kata "Kelas", titik, spasi dll
+            $nama_kelas = preg_replace('/[^0-9A-Za-z]/', '', $nama_kelas);
+
             if (!$nama || !$nis || !$nama_kelas) {
                 $errors[] = "Baris ke-" . ($index + 1) . " tidak lengkap.";
                 continue;
             }
 
-            // Cari kelas
-            $kelas = Kelas::where('nama', $nama_kelas)->first();
+            $kelas = Kelas::whereRaw("REPLACE(UPPER(nama), ' ', '') = ?", [$nama_kelas])->first();
             if (!$kelas) {
-                $errors[] = "Baris ke-" . ($index + 1) . ": Kelas '$nama_kelas' tidak ditemukan.";
+                $errors[] = "Baris ke-" . ($index + 1) . ": Kelas '{$row[2]}' tidak ditemukan.";
                 continue;
             }
 
-            // Validasi NIS unik
             if (Siswa::where('nis', $nis)->exists()) {
                 $errors[] = "Baris ke-" . ($index + 1) . ": NIS '$nis' sudah terdaftar.";
                 continue;
             }
 
-            // Simpan data
             Siswa::create([
                 'nama' => $nama,
                 'nis' => $nis,
@@ -70,16 +77,14 @@ class SiswaController extends Controller
 
         DB::commit();
 
-        $message = 'Import selesai.';
         if (count($errors)) {
-            $message .= ' Beberapa baris dilewati.';
             return redirect()->route('admin.siswa.index')
-                ->with('success', $message)
+                ->with('success', 'Import selesai dengan beberapa error.')
                 ->with('import_errors', $errors);
         }
 
         return redirect()->route('admin.siswa.index')
-            ->with('success', 'Semua data siswa berhasil diimport.');
+            ->with('import_errors', $errors);
     } catch (\Exception $e) {
         DB::rollBack();
         return back()->withErrors(['msg' => 'Gagal import: ' . $e->getMessage()]);

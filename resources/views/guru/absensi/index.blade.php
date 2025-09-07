@@ -54,7 +54,7 @@
                             <td>{{ $guru->nama }}</td>
                           </tr>
                           <tr>
-                            <td style="font-weight: bold !important;">Mapel Mengajar</td>
+                            <td style="font-weight: bold !important;">Mapel</td>
                             <td style="width: 1px" class="px-2">
                               :
                             </td>
@@ -669,10 +669,10 @@
             lokasiKantor.longitude,
             userLat,
             userLng
-          );
+          ) * 1000;
 
           // Menentukan batas radius lokasi kantor (misalnya 0.2 km = 200 meter)
-          const radiusMaksimum = 0.2;
+          const radiusMaksimum = 200;
 
           if (distance > radiusMaksimum) {
             document.querySelectorAll(".location-warning").forEach(el => {
